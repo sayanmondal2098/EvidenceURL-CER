@@ -12,3 +12,4 @@ data/logs/
 data/raw/
 *.csv
 tables/
+tables/*
