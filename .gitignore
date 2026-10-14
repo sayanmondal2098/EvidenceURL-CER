@@ -13,3 +13,4 @@ data/raw/
 *.csv
 tables/
 tables/*
+*.jsonl
