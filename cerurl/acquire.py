@@ -9,8 +9,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-import shutil
 import sys
+import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -51,6 +51,34 @@ def _url(item: dict, source_id: str) -> str | None:
     if item.get("download_url_env"):
         return os.environ.get(item["download_url_env"])
     return item.get("download_url") or DEFAULT_URLS.get(source_id)
+
+
+def _copy_with_progress(response, destination: Path, emit, chunk_size: int=1024*1024) -> int:
+    """Write a response to a temporary file while exposing transfer progress."""
+    raw_length=response.headers.get("Content-Length")
+    try:
+        expected=int(raw_length) if raw_length else None
+    except ValueError:
+        expected=None
+    received=0
+    next_report=5*1024*1024
+    started=time.monotonic()
+    with destination.open("wb") as dest:
+        while True:
+            chunk=response.read(chunk_size)
+            if not chunk:
+                break
+            dest.write(chunk)
+            received+=len(chunk)
+            if received>=next_report:
+                if expected:
+                    emit(f"received {received / 1024 / 1024:.1f} MiB / {expected / 1024 / 1024:.1f} MiB")
+                else:
+                    emit(f"received {received / 1024 / 1024:.1f} MiB")
+                next_report=received + 5*1024*1024
+    elapsed=max(time.monotonic()-started, 0.001)
+    emit(f"transfer complete: {received / 1024 / 1024:.1f} MiB in {elapsed:.1f}s")
+    return received
 
 
 def _append_run_log(log_path: Path, result: dict) -> None:
@@ -131,21 +159,24 @@ def acquire_sources(plan_path: str, out_dir: str="data/acquired", dry_run: bool=
             refused.append({"source_id":source_id,"reason":"missing_pinned_crawl_id"}); emit(f"{source_id}: REFUSED (missing pinned crawl ID)"); continue
         filename=item.get("filename") or _safe_name(url,source_id)
         target=(root/source_id/filename).resolve(); target.parent.mkdir(parents=True,exist_ok=True)
+        temporary=target.with_suffix(target.suffix+".part")
         if dry_run:
             receipts.append({"source_id":source_id,"status":"dry_run_authorised","url":url,"target":str(target)}); emit(f"{source_id}/{item.get('artifact_id', filename)}: DRY RUN (authorised)"); continue
         emit(f"{source_id}/{item.get('artifact_id', filename)}: downloading")
         request=urllib.request.Request(url,headers={"User-Agent":item.get("user_agent","EvidenceURL-CER authorised research acquisition")})
         try:
-            with urllib.request.urlopen(request,timeout=int(item.get("timeout_seconds",60))) as response, target.open("wb") as dest:
-                shutil.copyfileobj(response,dest,length=1024*1024)
+            if temporary.exists(): temporary.unlink()
+            with urllib.request.urlopen(request,timeout=int(item.get("timeout_seconds",60))) as response:
                 headers={k:v for k,v in response.headers.items() if k.lower() in {"etag","last-modified","content-type","content-length"}}
+                _copy_with_progress(response,temporary,lambda message: emit(f"{source_id}/{item.get('artifact_id', filename)}: {message}"))
         except Exception as exc:
-            if target.exists(): target.unlink()
+            if temporary.exists(): temporary.unlink()
             refused.append({"source_id":source_id,"reason":f"download_failed:{type(exc).__name__}"}); emit(f"{source_id}/{item.get('artifact_id', filename)}: FAILED ({type(exc).__name__})"); continue
         expected_md5=item.get("expected_md5")
-        actual_md5=_md5(target)
+        actual_md5=_md5(temporary)
         if expected_md5 and actual_md5.lower()!=str(expected_md5).lower():
-            target.unlink(); refused.append({"source_id":source_id,"artifact_id":item.get("artifact_id"),"reason":"downloaded_artifact_md5_mismatch"}); emit(f"{source_id}/{item.get('artifact_id', filename)}: REJECTED (MD5 mismatch)"); continue
+            temporary.unlink(); refused.append({"source_id":source_id,"artifact_id":item.get("artifact_id"),"reason":"downloaded_artifact_md5_mismatch"}); emit(f"{source_id}/{item.get('artifact_id', filename)}: REJECTED (MD5 mismatch)"); continue
+        temporary.replace(target)
         receipt={"source_id":source_id,"artifact_id":item.get("artifact_id"),"source_registry_url":SOURCE_IDS[source_id]["url"],"download_url":url,"acquired_at":datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00","Z"),"artifact_path":str(target),"sha256":_sha(target),"md5":actual_md5,"expected_md5":expected_md5,"bytes":target.stat().st_size,"headers":headers,"authorisation":auth,"crawl_id":item.get("crawl_id"),"release_id":item.get("release_id"),"restricted_access_receipt_path":item.get("restricted_access_receipt_path")}
         receipt_path=target.with_suffix(target.suffix+".receipt.json"); receipt_path.write_text(json.dumps(receipt,indent=2)+"\n",encoding="utf-8"); receipts.append({"source_id":source_id,"status":"acquired","receipt":str(receipt_path),"sha256":receipt["sha256"]}); emit(f"{source_id}/{item.get('artifact_id', filename)}: ACQUIRED sha256={receipt['sha256'][:12]}…")
     result={"plan":str(plan_file),"out":str(root),"dry_run":dry_run,"only":sorted(only) if only else None,"acquired":receipts,"refused":refused}
