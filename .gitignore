@@ -6,3 +6,7 @@ __pycache__/
 data/raw/
 results/real_url_baseline/
 *.joblib
+
+*.zip
+data/logs/
+data/raw/
