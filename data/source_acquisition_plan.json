@@ -1,0 +1,124 @@
+{
+  "version": "1.0",
+  "sources": [
+    {
+      "source_id": "phiusiil",
+      "enabled": true,
+      "local_artifact_path": "data/raw/phiusiil.csv",
+      "release_id": "prepared local CER mapping CSV; source UCI ID 967 archive is intentionally not acquired",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://archive.ics.uci.edu/dataset/967/phiusiil+phishing+url+dataset"
+      }
+    },
+    {
+      "source_id": "phishtank",
+      "enabled": true,
+      "release_id": "online-valid CSV snapshot",
+      "user_agent": "EvidenceURL-CER/1.0 research-contact@example.invalid",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://phishtank.net/developer_info.php"
+      }
+    },
+    {
+      "source_id": "phishingeval",
+      "enabled": true,
+      "release_id": "Zenodo record 14804193 v3; selected core data artifacts",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://github.com/Fujiaoji/PhishingEval"
+      },
+      "artifacts": [
+        {
+          "artifact_id": "expand277_targetlist",
+          "enabled": true,
+          "filename": "expand277.zip",
+          "download_url": "https://zenodo.org/records/14804193/files/expand277.zip?download=1",
+          "expected_md5": "77aa5e10e62f31b3b547fc14cc3bdbc4",
+          "release_id": "Zenodo 14804193 v3; 243.3 MB target list"
+        },
+        {
+          "artifact_id": "phishing4190",
+          "enabled": true,
+          "filename": "phishing4190.zip",
+          "download_url": "https://zenodo.org/records/14804193/files/phishing4190.zip?download=1",
+          "expected_md5": "1210711df23ffa933b49adcd9bc76769",
+          "release_id": "Zenodo 14804193 v3; 1.0 GB sampled phishing dataset"
+        },
+        {
+          "artifact_id": "archive100",
+          "enabled": true,
+          "filename": "archive100.zip",
+          "download_url": "https://zenodo.org/records/14804193/files/archive100.zip?download=1",
+          "expected_md5": "2bfd14c8d46277a2532e71f306697543",
+          "release_id": "Zenodo 14804193 v3; 551.3 MB archived HTML/screenshots"
+        },
+        {
+          "artifact_id": "crawl_benign",
+          "enabled": true,
+          "filename": "crawl_benign.zip",
+          "download_url": "https://zenodo.org/records/14804193/files/crawl_benign.zip?download=1",
+          "expected_md5": "3bb9ce4f5cd53e79a7d6d54c974984ba",
+          "release_id": "Zenodo 14804193 v3; 225.2 MB benign crawl artifacts"
+        },
+        {
+          "artifact_id": "perturbated_dataset",
+          "enabled": true,
+          "filename": "perturbated_dataset.zip",
+          "download_url": "https://zenodo.org/records/14804193/files/perturbated_dataset.zip?download=1",
+          "expected_md5": "96a121d010fcc080104532f9d31c6353",
+          "release_id": "Zenodo 14804193 v3; 1.4 GB controlled perturbation data"
+        },
+        {
+          "artifact_id": "merge277",
+          "enabled": false,
+          "filename": "merge277.zip",
+          "download_url": "https://zenodo.org/records/14804193/files/merge277.zip?download=1",
+          "expected_md5": "87683b69a660218e4729d8928425eb81",
+          "release_id": "Zenodo 14804193 v3; 11.4 GB optional archive"
+        },
+        {
+          "artifact_id": "visible_dataset2",
+          "enabled": false,
+          "filename": "visible_dataset2.zip",
+          "download_url": "https://zenodo.org/records/14804193/files/visible_dataset2.zip?download=1",
+          "expected_md5": "f00bfca2792cf338efcc8589122c29a7",
+          "release_id": "Zenodo 14804193 v3; 16.6 GB optional visual perturbation archive"
+        }
+      ]
+    },
+    {
+      "source_id": "common_crawl",
+      "enabled": false,
+      "crawl_id": "REPLACE_WITH_PINNED_CC_MAIN_CRAWL_ID",
+      "download_url": "https://data.commoncrawl.org/REPLACE_WITH_EXACT_WARC_OR_WAT_OBJECT",
+      "release_id": "REPLACE_WITH_CDX_OR_WARC_RECORD_LOCATOR",
+      "authorisation": {
+        "acquisition_authorized_by_user": false,
+        "terms_reference": "https://www.commoncrawl.org/get-started"
+      }
+    },
+    {
+      "source_id": "tranco",
+      "enabled": true,
+      "filename": "top-1m.csv.zip",
+      "release_id": "latest list is mutable; pin resulting list ID and Last-Modified receipt",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://tranco-list.eu/"
+      }
+    },
+    {
+      "source_id": "phishark2026",
+      "enabled": false,
+      "download_url_env": "PHISHARK_2026_APPROVED_DOWNLOAD_URL",
+      "restricted_access_receipt_path": "REPLACE_WITH_LOCAL_SIGNED_DUA_OR_APPROVAL_RECEIPT",
+      "release_id": "REPLACE_WITH_APPROVED_RELEASE_ID",
+      "authorisation": {
+        "acquisition_authorized_by_user": false,
+        "terms_reference": "https://phishark2026dataset.com/"
+      }
+    }
+  ]
+}

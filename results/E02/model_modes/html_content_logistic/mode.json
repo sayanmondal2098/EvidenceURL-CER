@@ -1,0 +1,21 @@
+{
+  "blockers": [
+    "authoritative_URLTrust_source_not_supplied_or_pinned",
+    "no_permitted_HTML_content_cohort",
+    "no_audited_URLTrust_graph_edges",
+    "no_reliable_historical_availability_time",
+    "no_frozen_E02_train_calibration_test_split_manifest"
+  ],
+  "family": "feature-only logistic regression",
+  "features": "HTML text only where locally captured and permitted",
+  "hyperparameters": null,
+  "leakage_guard": {
+    "calibrate_on": "calibration_only",
+    "dangling_node_policy": "must be read from authoritative implementation; no substitute policy",
+    "fit_preprocessors_on": "training_only",
+    "heldout_graph_edges": "must be excluded unless original URLTrust semantics explicitly permits them",
+    "test_threshold": "locked_before_test"
+  },
+  "run_status": "BASELINE_NOT_REPRODUCIBLE",
+  "status": "NOT_RUN_NO_PERMITTED_HTML"
+}

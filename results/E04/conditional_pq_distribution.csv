@@ -1,0 +1,6 @@
+world_type,P_band,Q_signature,count,interpretation
+controlled_synthetic,high,verified,1,malicious_estimate_allowed_with_strong_Q
+controlled_synthetic,low,verified,1,signature_does_not_mean_benign
+controlled_synthetic,high,absent,1,unsigned_informative_not_benign
+controlled_synthetic,high,invalid,1,Q_changes_without_changing_P
+controlled_synthetic,high,invalid,1,integrity_failure_does_not_imply_benign

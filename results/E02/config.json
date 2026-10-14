@@ -1,0 +1,14 @@
+{
+  "calibration_policy": "calibrate only on calibration; lock threshold before test",
+  "experiment": "E02",
+  "graph_policy": "plain hyperlinks are not label-propagation edges without authoritative URLTrust semantics",
+  "mode_names": [
+    "url_lexical_logistic",
+    "html_content_logistic",
+    "xgboost",
+    "urltrust_graph_free_ablation",
+    "urltrust_full_frozen"
+  ],
+  "partition_policy": "one frozen train/calibration/test manifest shared by every mode",
+  "run_status": "BASELINE_NOT_REPRODUCIBLE"
+}

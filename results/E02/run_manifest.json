@@ -1,0 +1,58 @@
+{
+  "adapters": {
+    "html_content": {
+      "available": false
+    },
+    "hyperlink_graph": {
+      "available": false,
+      "edge_count": 0
+    },
+    "url_lexical": {
+      "available": true
+    }
+  },
+  "authoritative_urltrust": {
+    "policy": "No URLTrust-like local implementation may be substituted for the authoritative source.",
+    "present": false,
+    "requested_path": null,
+    "sha256": null
+  },
+  "blockers": [
+    "authoritative_URLTrust_source_not_supplied_or_pinned",
+    "no_permitted_HTML_content_cohort",
+    "no_audited_URLTrust_graph_edges",
+    "no_reliable_historical_availability_time",
+    "no_frozen_E02_train_calibration_test_split_manifest"
+  ],
+  "experiment": "E02",
+  "run_at": "2026-10-14T10:20:10Z",
+  "run_status": "BASELINE_NOT_REPRODUCIBLE",
+  "same_partition_required": true,
+  "source_hashes": [
+    {
+      "bytes": 219758,
+      "path": "results\\E01\\audit.json",
+      "sha256": "e4a990ad23bbdfe2a810d759d5f6b6e87f389ed98d63986f6c0fa9b824ff7b11"
+    },
+    {
+      "bytes": 13762844,
+      "path": "data\\raw\\phiusiil.csv",
+      "sha256": "b35d187d53fe54682898f3e15a1e7a5fe47fc29a6d50e6f83839ed60d1055204"
+    },
+    {
+      "bytes": 111961536,
+      "path": "tables\\urls.csv",
+      "sha256": "3cb3925efa24a4038f260af303fadcb722a399e35c9da46b75c2a4d53b61f7e9"
+    },
+    {
+      "bytes": 169300810,
+      "path": "tables\\observations.jsonl",
+      "sha256": "0842ca30a9ca3d8c71e9622aec76d07db4443e99a2d5e790490d913c4961cd73"
+    },
+    {
+      "bytes": 174,
+      "path": "tables\\url_graph_edges.csv",
+      "sha256": "f64b5aa054bbdd422b03710f7c7b8564c7e711e9f0bb4db51b0838f2ac088708"
+    }
+  ]
+}

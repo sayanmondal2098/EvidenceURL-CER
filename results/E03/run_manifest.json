@@ -1,0 +1,38 @@
+{
+  "blocked_leakage_count": 0,
+  "blockers": [
+    "all_historical_records_lack_authenticated_availability_time",
+    "eTLD_plus_one_unavailable_without_public_suffix_list",
+    "campaign_ids_not_supplied",
+    "no_frozen_temporal_train_calibration_test_split",
+    "no_authoritative_URLTrust_reproduction_for_matched_baseline"
+  ],
+  "controls": {
+    "checks": {
+      "future_feature_flagged": true,
+      "group_overlap_flagged": true
+    },
+    "executed": true,
+    "passed": true
+  },
+  "experiment": "E03",
+  "first_seen_qualified_records": 0,
+  "grouping": {
+    "campaign": "not_supplied",
+    "eTLD_plus_one": "unavailable",
+    "infrastructure": "not_supplied"
+  },
+  "historical_records_lacking_provable_availability_time": 235795,
+  "replay_audit_rows": 0,
+  "required_before_run": [
+    "authenticated source/evidence availability times",
+    "frozen past-train/later-calibration/future-test split",
+    "Public Suffix List-derived eTLD+1",
+    "campaign/infrastructure group IDs",
+    "pinned authoritative URLTrust implementation and matched baselines"
+  ],
+  "run_at": "2026-10-14T10:26:34Z",
+  "run_status": "NOT_RUN_TEMPORAL_ELIGIBILITY_BLOCKED",
+  "source_audit": "results\\E01\\audit.json",
+  "test_cases": 0
+}

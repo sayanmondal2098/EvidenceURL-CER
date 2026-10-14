@@ -1,0 +1,16 @@
+{
+  "K(u)": {
+    "available_for_phiusiil": "not available; no evidence/graph provenance",
+    "meaning": "source/graph certificate budget under an explicit certified threat model"
+  },
+  "P(u)": {
+    "available_for_phiusiil": "label only; no E04 model score was run",
+    "meaning": "estimated maliciousness probability/risk; never inferred from signature or hash status",
+    "range": "[0,1] when a calibrated maliciousness model exists"
+  },
+  "Q(o)": {
+    "meaning": "structured evidence assurance attributes (integrity, signature, trusted time, provenance/vantage), not website trustworthiness",
+    "representation": "named categorical components; no uncalibrated scalar"
+  },
+  "prohibited_inference": "signature_verified => benign or low P(u)"
+}

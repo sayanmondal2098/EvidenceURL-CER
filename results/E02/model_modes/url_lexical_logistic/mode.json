@@ -1,0 +1,32 @@
+{
+  "blockers": [
+    "authoritative_URLTrust_source_not_supplied_or_pinned",
+    "no_permitted_HTML_content_cohort",
+    "no_audited_URLTrust_graph_edges",
+    "no_reliable_historical_availability_time",
+    "no_frozen_E02_train_calibration_test_split_manifest"
+  ],
+  "family": "feature-only logistic regression",
+  "features": "canonical URL character TF-IDF only",
+  "hyperparameters": {
+    "class_weight": "balanced",
+    "max_features": 70000,
+    "max_iter": 700,
+    "min_df": 2,
+    "ngram_range": [
+      2,
+      4
+    ],
+    "solver": "liblinear",
+    "sublinear_tf": true
+  },
+  "leakage_guard": {
+    "calibrate_on": "calibration_only",
+    "dangling_node_policy": "must be read from authoritative implementation; no substitute policy",
+    "fit_preprocessors_on": "training_only",
+    "heldout_graph_edges": "must be excluded unless original URLTrust semantics explicitly permits them",
+    "test_threshold": "locked_before_test"
+  },
+  "run_status": "BASELINE_NOT_REPRODUCIBLE",
+  "status": "NOT_RUN_COMMON_E02_PARTITION_MISSING"
+}

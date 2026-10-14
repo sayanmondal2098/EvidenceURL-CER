@@ -1,0 +1,66 @@
+{
+  "version": "1.0",
+  "sources": [
+    {
+      "source_id": "phiusiil",
+      "enabled": true,
+      "local_artifact_path": "data/raw/phiusiil.csv",
+      "release_id": "prepared local CER mapping; source UCI ID 967",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://archive.ics.uci.edu/dataset/967/phiusiil+phishing+url+dataset"
+      }
+    },
+    {
+      "source_id": "phishtank",
+      "enabled": true,
+      "release_id": "online-valid CSV snapshot",
+      "user_agent": "EvidenceURL-CER/1.0 research-contact@example.invalid",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://phishtank.net/developer_info.php"
+      }
+    },
+    {
+      "source_id": "phishingeval",
+      "enabled": true,
+      "release_id": "GitHub main repository snapshot; data release must be separately pinned",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://github.com/Fujiaoji/PhishingEval"
+      }
+    },
+    {
+      "source_id": "common_crawl",
+      "enabled": false,
+      "crawl_id": "REPLACE_WITH_PINNED_CC_MAIN_CRAWL_ID",
+      "download_url": "https://data.commoncrawl.org/REPLACE_WITH_EXACT_WARC_OR_WAT_OBJECT",
+      "release_id": "REPLACE_WITH_CDX_OR_WARC_RECORD_LOCATOR",
+      "authorisation": {
+        "acquisition_authorized_by_user": false,
+        "terms_reference": "https://www.commoncrawl.org/get-started"
+      }
+    },
+    {
+      "source_id": "tranco",
+      "enabled": true,
+      "filename": "top-1m.csv.zip",
+      "release_id": "latest list is mutable; pin resulting list ID and Last-Modified receipt",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://tranco-list.eu/"
+      }
+    },
+    {
+      "source_id": "phishark2026",
+      "enabled": false,
+      "download_url_env": "PHISHARK_2026_APPROVED_DOWNLOAD_URL",
+      "restricted_access_receipt_path": "REPLACE_WITH_LOCAL_SIGNED_DUA_OR_APPROVAL_RECEIPT",
+      "release_id": "REPLACE_WITH_APPROVED_RELEASE_ID",
+      "authorisation": {
+        "acquisition_authorized_by_user": false,
+        "terms_reference": "https://phishark2026dataset.com/"
+      }
+    }
+  ]
+}

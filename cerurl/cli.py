@@ -11,6 +11,11 @@ from .html_artifacts import extract_manifest
 from .feeds import import_snapshot
 from .repair import repair,RepairConfig
 from .curation import curate_e01
+from .e02 import prepare_e02
+from .e03 import prepare_e03
+from .e04 import prepare_e04
+from .sources import write_source_registry
+from .acquire import acquire_sources
 
 
 def main(argv=None):
@@ -55,6 +60,25 @@ def main(argv=None):
     d.add_argument('--tables',default='tables')
     d.add_argument('--decisions',help='Optional CSV with url,decision_at for post-decision graph-edge checks')
     d.add_argument('--source-schema',choices=['auto','urltrust','phiusiil','cer_binary'],default='auto',help='Documented input label convention; auto only recognises these schemas')
+    d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
+    d.add_argument('--out',default='results/E02')
+    d.add_argument('--audit',default='results/E01/audit.json')
+    d=cmd.add_parser('source-registry',help='Write prospective source intake registry; does not download data')
+    d.add_argument('--json-out',default='data/source_registry.json')
+    d.add_argument('--markdown-out',default='docs/SOURCE_ACQUISITION_REGISTRY.md')
+    d=cmd.add_parser('acquire-sources',help='One-plan downloader for explicitly authorised source artifacts')
+    d.add_argument('--plan',required=True,help='JSON acquisition plan; see data/source_acquisition_plan.example.json')
+    d.add_argument('--out',default='data/acquired')
+    d.add_argument('--dry-run',action='store_true')
+    d.add_argument('--only',help='Comma-separated source IDs to acquire; leaves other plan entries untouched')
+    d.add_argument('--log',default='data/logs/source_acquisition.jsonl',help='Append a URL-free JSONL run log here; pass an empty string to disable')
+    d=cmd.add_parser('prepare-e04',help='Create assurance/maliciousness separation audit artifacts')
+    d.add_argument('--out',default='results/E04')
+    d.add_argument('--audit',default='results/E01/audit.json')
+    d.add_argument('--authoritative-dir',help='Pinned authoritative URLTrust source checkout; required before any E02 model can run')
+    d=cmd.add_parser('prepare-e03',help='Create a fail-closed temporal/domain-disjoint evaluation package')
+    d.add_argument('--out',default='results/E03')
+    d.add_argument('--audit',default='results/E01/audit.json')
     args=p.parse_args(argv)
     if args.command=='download-uci': result=download_uci(args.out)
     elif args.command=='generate':
@@ -84,6 +108,11 @@ def main(argv=None):
         result=curate_e01(args.index,args.html_root,args.out,args.tables,args.decisions,args.source_schema)
         result={'out':args.out,'tables':args.tables,'flow':result['flow'],
                 'pass_criteria':result['pass_criteria'],'controls':result['controls']}
+    elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
+    elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
+    elif args.command=='prepare-e04': result=prepare_e04(args.out,args.audit)
+    elif args.command=='source-registry': result=write_source_registry(args.json_out,args.markdown_out)
+    elif args.command=='acquire-sources': result=acquire_sources(args.plan,args.out,args.dry_run,set(args.only.split(',')) if args.only else None,args.log)
     print(json.dumps(result,indent=2))
     return 0
 

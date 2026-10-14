@@ -1,0 +1,13 @@
+{
+  "experiment": "E03",
+  "gap_days": [
+    0,
+    7,
+    14,
+    30
+  ],
+  "group_rule": "no eTLD+1/campaign/infrastructure value may span frozen partitions",
+  "random_split": "diagnostic_only_never_primary",
+  "status": "NOT_RUN_TEMPORAL_ELIGIBILITY_BLOCKED",
+  "temporal_rule": "feature.available_at <= decision_at for every replayed feature"
+}

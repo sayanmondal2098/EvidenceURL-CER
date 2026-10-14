@@ -185,3 +185,17 @@ cerurl ingest-feed --source tranco --csv data/raw/tranco.csv --out data/tranco_c
 - Tranco records remain `benign_candidate_unverified`, **not known benign**.
 - Local ingest time is separate from source-reported verification/submission time; no genuine HTML capture time is invented.
 - Snapshot records cannot directly substitute for independent collector observations in a certification experiment.
+
+## One-command authorised source acquisition
+
+The source registry and [example acquisition plan](data/source_acquisition_plan.example.json) cover PhiUSIIL, PhishTank, PhishingEval, Common Crawl, Tranco, and PhiShark 2026. Copy the example to a private local plan, pin the intended release/crawl URLs, record the applicable terms, and obtain any required access approval. Then acquire every enabled source with one command:
+
+```bash
+cerurl acquire-sources --plan data/source_acquisition_plan.json --out data/acquired
+```
+
+Use `--dry-run` first. Each download receives a SHA-256 receipt containing its retrieval time, source/release identifiers, selected response headers, and terms reference. The command refuses any source lacking explicit authorisation; it also refuses PhiShark without a local approval/DUA receipt and provider-issued URL. It only downloads artifact bytesâ€”it does not open URLs from feeds, extract archives, or execute archived HTML. Every invocation also appends a URL-free JSONL run log to `data/logs/source_acquisition.jsonl`, with statuses, receipts/hashes where available, and refusals. Use `--log path/to/log.jsonl` to choose another location.
+
+The supplied plan registers only the already prepared `data/raw/phiusiil.csv` under the receipt system. The official UCI ZIP archive is intentionally not acquired unless a future plan explicitly requests it.
+
+PhishingEval is handled as distinct Zenodo dataset artifacts, not as the GitHub source ZIP. The active plan downloads its core target-list, phishing, archived/benign HTML, and controlled-perturbation bundles (about 3.4 GB total) with published MD5 verification; the much larger `merge277` and `visible_dataset2` archives stay disabled until explicitly enabled in the plan.

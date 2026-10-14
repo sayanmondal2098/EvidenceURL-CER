@@ -1,0 +1,6 @@
+P_band,Q_level,count,world_type
+malicious_estimate,high,1,controlled_synthetic
+benign_estimate,high,1,controlled_synthetic
+malicious_estimate,low_or_unknown,1,controlled_synthetic
+malicious_estimate,low_or_unknown,1,controlled_synthetic
+malicious_estimate,low_or_unknown,1,controlled_synthetic
