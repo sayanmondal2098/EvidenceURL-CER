@@ -11,3 +11,4 @@ results/real_url_baseline/
 data/logs/
 data/raw/
 *.csv
+tables/
