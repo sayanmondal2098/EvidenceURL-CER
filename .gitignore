@@ -10,3 +10,4 @@ results/real_url_baseline/
 *.zip
 data/logs/
 data/raw/
+*.csv
