@@ -72,6 +72,7 @@ def main(argv=None):
     d.add_argument('--dry-run',action='store_true')
     d.add_argument('--only',help='Comma-separated source IDs to acquire; leaves other plan entries untouched')
     d.add_argument('--log',default='data/logs/source_acquisition.jsonl',help='Append a URL-free JSONL run log here; pass an empty string to disable')
+    d.add_argument('--quiet',action='store_true',help='Suppress live acquisition progress messages on the terminal')
     d=cmd.add_parser('prepare-e04',help='Create assurance/maliciousness separation audit artifacts')
     d.add_argument('--out',default='results/E04')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -112,7 +113,7 @@ def main(argv=None):
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
     elif args.command=='prepare-e04': result=prepare_e04(args.out,args.audit)
     elif args.command=='source-registry': result=write_source_registry(args.json_out,args.markdown_out)
-    elif args.command=='acquire-sources': result=acquire_sources(args.plan,args.out,args.dry_run,set(args.only.split(',')) if args.only else None,args.log)
+    elif args.command=='acquire-sources': result=acquire_sources(args.plan,args.out,args.dry_run,set(args.only.split(',')) if args.only else None,args.log,not args.quiet)
     print(json.dumps(result,indent=2))
     return 0
 
