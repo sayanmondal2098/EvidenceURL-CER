@@ -10,6 +10,7 @@ from .real_seed import anchors_to_controlled
 from .html_artifacts import extract_manifest
 from .feeds import import_snapshot
 from .repair import repair,RepairConfig
+from .curation import curate_e01
 
 
 def main(argv=None):
@@ -47,6 +48,13 @@ def main(argv=None):
     d=cmd.add_parser('inspect',help='Inspect synthetic trust/certificate and repair case')
     d.add_argument('--data',default='data/controlled_cases.jsonl');d.add_argument('--index',type=int,default=0)
     d.add_argument('--budget',type=int,default=1);d.add_argument('--policy',default='counterfactual')
+    d=cmd.add_parser('curate-e01',help='Fail-closed URLTrust/source provenance curation and leakage audit')
+    d.add_argument('--index',help='Local URLTrust index (.sqlite/.db/.csv/.json/.jsonl); absent produces an explicit no-data audit')
+    d.add_argument('--html-root',help='Local HTML archive root; only paths declared in the index are read')
+    d.add_argument('--out',default='results/E01')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--decisions',help='Optional CSV with url,decision_at for post-decision graph-edge checks')
+    d.add_argument('--source-schema',choices=['auto','urltrust','phiusiil','cer_binary'],default='auto',help='Documented input label convention; auto only recognises these schemas')
     args=p.parse_args(argv)
     if args.command=='download-uci': result=download_uci(args.out)
     elif args.command=='generate':
@@ -72,6 +80,10 @@ def main(argv=None):
         result={'case_id':c.case_id,'before':certify(c,args.budget),
                 'exact_min_flip':minimum_flip_groups(c),
                 'repair':repair(c,args.policy,RepairConfig(budget=args.budget))}
+    elif args.command=='curate-e01':
+        result=curate_e01(args.index,args.html_root,args.out,args.tables,args.decisions,args.source_schema)
+        result={'out':args.out,'tables':args.tables,'flow':result['flow'],
+                'pass_criteria':result['pass_criteria'],'controls':result['controls']}
     print(json.dumps(result,indent=2))
     return 0
 

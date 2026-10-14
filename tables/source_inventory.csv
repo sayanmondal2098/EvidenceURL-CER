@@ -1,0 +1,2 @@
+source_dataset,artifact_path,artifact_sha256,raw_rows,authority,external_access_terms,acquisition_status,time_semantics
+PhiUSIIL_UCI_967,data\raw\phiusiil.csv,b35d187d53fe54682898f3e15a1e7a5fe47fc29a6d50e6f83839ed60d1055204,235795,local_copy_of_UCI_dataset_unverified_against_upstream,CC_BY_4.0_claimed_in_project_README; verify upstream before redistribution,local_artifact_present,official original_label=1 legitimate/benign and 0 phishing; prepared CER label must be its exact inverse; no timestamp fields establish first-seen eligibility

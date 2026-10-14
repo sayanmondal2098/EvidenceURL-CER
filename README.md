@@ -67,6 +67,34 @@ cerurl extract-html --manifest examples/html_manifest.csv --root examples/html -
 
 This parses file bytes without visiting external links, running JavaScript, or executing downloads. Its output includes SHA-256, links, scripts, iframe references, form actions, and password-input presence. It explicitly leaves capture time `null` and source verification `false` unless independently established. A local HTML record is **not independent witness evidence** and is not fed into resilience certification automatically.
 
+## E01 provenance curation and leakage audit
+
+For a locally supplied URLTrust-style index (CSV, JSON/JSONL, or SQLite table) and its separately archived HTML directory:
+
+```bash
+cerurl curate-e01 --index database/index.sqlite --html-root database --out results/E01 --tables tables
+```
+
+The adapter also recognises the local prepared PhiUSIIL release and verifies
+that its `label` is the exact inverse of `original_label` before any row is
+included:
+
+```bash
+cerurl curate-e01 --index data/raw/phiusiil.csv --source-schema phiusiil --out results/E01 --tables tables
+```
+
+The command produces normalized `tables/urls.csv`, `tables/observations.jsonl`,
+source/provenance and URL-graph tables, plus `results/E01/audit.json`, a complete
+inclusion/exclusion ledger, duplicate/conflict report, and sanitized sample
+ledger. `result=0` maps only to `benign` and `result=1` only to `phishing`.
+It never treats `created_date` as HTML capture time, never treats unavailable
+HTML as benign, and blocks first-seen evaluation when historical availability
+metadata is absent.  The built-in assertion controls demonstrate detection of
+train/test URL overlap, post-decision evidence, and two feeds mirroring one
+upstream source.  It does not import external threat feeds; those require a
+separately retained, authorised snapshot and provenance record before they can
+be added to an E01 run.
+
 ## Confirmed compromised-source quarantine
 
 ```bash
