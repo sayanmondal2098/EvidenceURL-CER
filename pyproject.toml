@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "evidenceurl-cer"
+version = "0.1.0"
+description = "Research prototype for certified counterfactual evidence repair in URL intelligence"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "pandas>=2.0", "scipy>=1.10", "scikit-learn>=1.3", "matplotlib>=3.7", "joblib>=1.3"]
+
+[project.optional-dependencies]
+uci = ["ucimlrepo>=0.0.7"]
+test = ["pytest>=7.4"]
+
+[project.scripts]
+cerurl = "cerurl.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cerurl*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

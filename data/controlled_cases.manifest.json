@@ -1,0 +1,9 @@
+{
+  "dataset": "CER-URLBench controlled simulator",
+  "world_type": "controlled_synthetic",
+  "n_cases": 160,
+  "seed": 42,
+  "n_groups": 6,
+  "shared_probability": 0.28,
+  "warning": "Not real URLs, real provenance, or zero-day performance"
+}

@@ -1,0 +1,630 @@
+{
+  "dataset": "D:\\URL Trust\\EvidenceURL-CER\\data\\demo_from_scratch.jsonl",
+  "world_type": "controlled_synthetic",
+  "n_cases": 40,
+  "policies": [
+    "counterfactual",
+    "random",
+    "uncertainty",
+    "cheapest"
+  ],
+  "budgets": [
+    0,
+    1,
+    2
+  ],
+  "seed": 7,
+  "configuration": {
+    "alpha": 0.35,
+    "tau_b": 0.4,
+    "tau_m": 0.6,
+    "acquisition_budget": 3.0,
+    "new_weight": 0.3,
+    "max_steps": 3
+  },
+  "budget_0_counterfactual": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.875,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 1.0,
+      "certified_coverage": 1.0,
+      "abstention_rate": 0.0,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          17,
+          0
+        ],
+        [
+          0,
+          23
+        ]
+      ]
+    },
+    "corrected_cases": 5,
+    "degraded_cases": 0,
+    "corrected_fraction_all_cases": 0.125,
+    "degraded_fraction_all_cases": 0.0,
+    "mean_actions": 0.15,
+    "mean_acquisition_cost": 0.15625,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_0_random": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.875,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 0.975,
+      "certified_coverage": 0.975,
+      "abstention_rate": 0.025000000000000022,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          17,
+          0
+        ],
+        [
+          0,
+          22
+        ]
+      ]
+    },
+    "corrected_cases": 4,
+    "degraded_cases": 0,
+    "corrected_fraction_all_cases": 0.1,
+    "degraded_fraction_all_cases": 0.0,
+    "mean_actions": 0.175,
+    "mean_acquisition_cost": 0.20375000000000001,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_0_uncertainty": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.875,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 1.0,
+      "certified_coverage": 1.0,
+      "abstention_rate": 0.0,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          17,
+          0
+        ],
+        [
+          0,
+          23
+        ]
+      ]
+    },
+    "corrected_cases": 5,
+    "degraded_cases": 0,
+    "corrected_fraction_all_cases": 0.125,
+    "degraded_fraction_all_cases": 0.0,
+    "mean_actions": 0.175,
+    "mean_acquisition_cost": 0.175,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_0_cheapest": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.875,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 0.975,
+      "certified_coverage": 0.975,
+      "abstention_rate": 0.025000000000000022,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          17,
+          0
+        ],
+        [
+          0,
+          22
+        ]
+      ]
+    },
+    "corrected_cases": 4,
+    "degraded_cases": 0,
+    "corrected_fraction_all_cases": 0.1,
+    "degraded_fraction_all_cases": 0.0,
+    "mean_actions": 0.325,
+    "mean_acquisition_cost": 0.28375,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_1_counterfactual": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.5,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 0.875,
+      "certified_coverage": 0.525,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          16,
+          0
+        ],
+        [
+          0,
+          19
+        ]
+      ]
+    },
+    "corrected_cases": 3,
+    "degraded_cases": 3,
+    "corrected_fraction_all_cases": 0.075,
+    "degraded_fraction_all_cases": 0.075,
+    "mean_actions": 1.45,
+    "mean_acquisition_cost": 1.4112500000000001,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_1_random": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.5,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 0.875,
+      "certified_coverage": 0.5,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          16,
+          0
+        ],
+        [
+          0,
+          19
+        ]
+      ]
+    },
+    "corrected_cases": 3,
+    "degraded_cases": 3,
+    "corrected_fraction_all_cases": 0.075,
+    "degraded_fraction_all_cases": 0.075,
+    "mean_actions": 1.175,
+    "mean_acquisition_cost": 1.3387499999999999,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_1_uncertainty": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.5,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 0.95,
+      "certified_coverage": 0.525,
+      "abstention_rate": 0.050000000000000044,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          17,
+          0
+        ],
+        [
+          0,
+          21
+        ]
+      ]
+    },
+    "corrected_cases": 5,
+    "degraded_cases": 2,
+    "corrected_fraction_all_cases": 0.125,
+    "degraded_fraction_all_cases": 0.05,
+    "mean_actions": 1.475,
+    "mean_acquisition_cost": 1.3787500000000001,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_1_cheapest": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.5,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 0.9,
+      "certified_coverage": 0.525,
+      "abstention_rate": 0.09999999999999998,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          16,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "corrected_cases": 4,
+    "degraded_cases": 3,
+    "corrected_fraction_all_cases": 0.1,
+    "degraded_fraction_all_cases": 0.075,
+    "mean_actions": 1.475,
+    "mean_acquisition_cost": 1.3,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_2_counterfactual": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.0,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 0.8,
+      "certified_coverage": 0.0,
+      "abstention_rate": 0.19999999999999996,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          14,
+          0
+        ],
+        [
+          0,
+          18
+        ]
+      ]
+    },
+    "corrected_cases": 4,
+    "degraded_cases": 7,
+    "corrected_fraction_all_cases": 0.1,
+    "degraded_fraction_all_cases": 0.175,
+    "mean_actions": 2.925,
+    "mean_acquisition_cost": 2.88375,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_2_random": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.0,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 0.8,
+      "certified_coverage": 0.0,
+      "abstention_rate": 0.19999999999999996,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          17
+        ]
+      ]
+    },
+    "corrected_cases": 3,
+    "degraded_cases": 6,
+    "corrected_fraction_all_cases": 0.075,
+    "degraded_fraction_all_cases": 0.15,
+    "mean_actions": 2.35,
+    "mean_acquisition_cost": 2.71375,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_2_uncertainty": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.0,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 0.925,
+      "certified_coverage": 0.0,
+      "abstention_rate": 0.07499999999999996,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          17,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "corrected_cases": 5,
+    "degraded_cases": 3,
+    "corrected_fraction_all_cases": 0.125,
+    "degraded_fraction_all_cases": 0.075,
+    "mean_actions": 3.0,
+    "mean_acquisition_cost": 2.7725,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "budget_2_cheapest": {
+    "n_cases": 40,
+    "before": {
+      "coverage": 0.875,
+      "certified_coverage": 0.0,
+      "abstention_rate": 0.125,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          15,
+          0
+        ],
+        [
+          0,
+          20
+        ]
+      ]
+    },
+    "after": {
+      "coverage": 0.85,
+      "certified_coverage": 0.0,
+      "abstention_rate": 0.15000000000000002,
+      "selective_accuracy": 1.0,
+      "selective_precision": 1.0,
+      "selective_recall": 1.0,
+      "selective_f1": 1.0,
+      "confusion_matrix_0benign_1phishing": [
+        [
+          16,
+          0
+        ],
+        [
+          0,
+          18
+        ]
+      ]
+    },
+    "corrected_cases": 4,
+    "degraded_cases": 5,
+    "corrected_fraction_all_cases": 0.1,
+    "degraded_fraction_all_cases": 0.125,
+    "mean_actions": 3.0,
+    "mean_acquisition_cost": 2.65,
+    "warning": "Controlled synthetic outcomes; not field phishing detection or true zero-day scores"
+  },
+  "attack_audit": [
+    {
+      "source_budget": 0,
+      "n_cases": 40,
+      "n_attack_trials": 80,
+      "certified_coverage": 0.875,
+      "attack_flip_fraction_over_trials": 0.0,
+      "certificate_violations": 0,
+      "guarantee_tested": "fixed P and weights, bounded root-group observations"
+    },
+    {
+      "source_budget": 1,
+      "n_cases": 40,
+      "n_attack_trials": 634,
+      "certified_coverage": 0.5,
+      "attack_flip_fraction_over_trials": 0.14826498422712933,
+      "certificate_violations": 0,
+      "guarantee_tested": "fixed P and weights, bounded root-group observations"
+    },
+    {
+      "source_budget": 2,
+      "n_cases": 40,
+      "n_attack_trials": 2278,
+      "certified_coverage": 0.0,
+      "attack_flip_fraction_over_trials": 0.38981562774363476,
+      "certificate_violations": 0,
+      "guarantee_tested": "fixed P and weights, bounded root-group observations"
+    }
+  ]
+}

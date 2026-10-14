@@ -1,0 +1,13 @@
+budget,policy,certified_before,certified_after,selective_accuracy_after,coverage_after,corrections,degradations,mean_cost
+0,counterfactual,1.0,1.0,1.0,1.0,0,0,0.0
+0,random,1.0,1.0,1.0,1.0,0,0,0.0
+0,uncertainty,1.0,1.0,1.0,1.0,0,0,0.0
+0,cheapest,1.0,1.0,1.0,1.0,0,0,0.0
+1,counterfactual,0.85,0.85,1.0,1.0,0,0,0.43499999999999994
+1,random,0.85,0.875,1.0,1.0,0,0,0.34875
+1,uncertainty,0.85,0.875,1.0,1.0,0,0,0.37375
+1,cheapest,0.85,0.85,1.0,1.0,0,0,0.39749999999999996
+2,counterfactual,0.0,0.0,1.0,1.0,0,0,2.89375
+2,random,0.0,0.0,1.0,1.0,0,0,2.71375
+2,uncertainty,0.0,0.0,1.0,1.0,0,0,2.78125
+2,cheapest,0.0,0.0,1.0,1.0,0,0,2.65
