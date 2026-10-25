@@ -161,6 +161,27 @@ guarantees. Writes `results/E12` (`audit.json`, challenge results/sets and a
 SHA-256 manifest) and `tables/e12_counterfactual.tex`. These are controlled
 simulation results, not field vulnerability estimates.
 
+### E13 - Matched-budget repair action selection
+
+`cerurl run-e13 [--cases 40 --repeats 3 --seed 20261313 --budgets 0,1,2,3,5,10]`
+compares no-repair, random, uncertainty, disagreement, independent-diversity,
+expected-risk-greedy, and certificate-guided repair on the same controlled
+synthetic cases, action menus, prices, calibration outcome estimates, and
+attempt budgets. Selectors receive only observed evidence and calibrated
+outcome distributions; a candidate's sealed outcome is revealed only after it
+is chosen. The calibration pool uses a separate seed from the evaluation
+worlds. Paired loss deltas and bootstrap intervals are reported overall and
+when acquired evidence contradicts the initial verdict. Efficacy is reported
+separately from protocol validity: failure to show a paired loss improvement
+also fails the experiment pass criterion.
+
+Writes `results/E13` (audit, per-trial/paired results, chosen-action log,
+per-policy action counts, and SHA-256 manifest) and `tables/e13_repair.tex`.
+Expected and actual losses use explicit false-negative, false-positive, and
+abstention costs. Certificate coverage measures stability under the declared
+source-group budget, not correctness. Results are controlled simulations,
+not field performance.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -206,6 +227,7 @@ cerurl run-e09 --out results/E09 --tables tables
 cerurl run-e10 --out results/E10 --tables tables
 cerurl run-e11 --out results/E11 --tables tables
 cerurl run-e12 --out results/E12 --tables tables
+cerurl run-e13 --out results/E13 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
