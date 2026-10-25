@@ -308,6 +308,37 @@ repair and graph-fusion tables, an audit and SHA-256 manifest, plus
 `tables/e18_ablations.tex`. Results are controlled synthetic experiments; no
 field accuracy or deployment claim follows.
 
+### E19 - Scale, latency, incremental graph repair, and storage
+
+`cerurl run-e19 [--sizes 1000,10000,100000,1000000 --repeats 5]` measures
+synthetic evidence ingestion, ancestor closure, sparse full propagation,
+incremental trust updates, representative exact/LP certificate solves,
+certificate proof checks, CER-guided action selection, and durable CSV writes.
+The 1-million-row size is attempted only when the reported RAM and disk
+headroom checks permit it; any skipped scale is recorded with a reason.
+No result is extrapolated to a size that was not run.
+
+The workload has one sparse graph node and evidence record per observed URL.
+The certificate MILP/LP measurements are representative source-group cases
+(8-20 groups), not one solver invocation per URL. Latency percentiles identify
+their sampling unit and sample count; sparse full/incremental propagation
+percentiles are repeated complete solves. The audit records detected CPU/RAM,
+graph degree, source-group/ancestor statistics, peak working set, per-URL CPU
+time, storage bytes per URL, solver gaps, process working-set changes by
+source-group and action budgets, incremental/full agreement, and complexity
+approximations. Memory deltas are process-level observations and can include
+allocator effects rather than isolated solver allocations.
+`scalability.png`, `certificate_costs.png`, a
+`cProfile` trace and text report are generated. Network collection, monetary
+cost, and real URL ingestion are not measured; the workload is controlled
+synthetic and is not deployment performance evidence.
+
+Writes `results/E19` and `tables/e19_scale_summary.csv`. Incremental updates
+use a sparse fixed-point solve of the changed seed delta and are checked
+against a full solve on each measured graph. The implementation still walks
+the full sparse graph each iteration; it does not claim a localized-subgraph
+complexity improvement.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -359,6 +390,7 @@ cerurl run-e15 --out results/E15 --tables tables
 cerurl run-e16 --out results/E16 --tables tables
 cerurl run-e17 --out results/E17 --tables tables
 cerurl run-e18 --out results/E18 --tables tables
+cerurl run-e19 --out results/E19 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
@@ -369,7 +401,7 @@ cerurl download-uci --out data/raw/phiusiil.csv
 cerurl train --csv data/raw/phiusiil.csv --source cer --out results/real_url_baseline --sample 20000
 ```
 
-E19-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. E16 requires its prospective input ledgers, while E17-E18 are controlled-only in the absence of field datasets. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
+E20 remains a protocol item in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and has no runnable command yet. E16 requires its prospective input ledgers, while E17-E19 are controlled-only in the absence of field datasets. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
 
 ## Confirmed compromised-source quarantine
 

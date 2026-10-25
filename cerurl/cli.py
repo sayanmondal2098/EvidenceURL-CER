@@ -26,6 +26,7 @@ from .e15 import run_e15
 from .e16 import run_e16
 from .e17 import run_e17
 from .e18 import run_e18
+from .e19 import DEFAULT_SIZES, run_e19
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -165,6 +166,13 @@ def main(argv=None):
     d.add_argument('--cases',type=int,default=48)
     d.add_argument('--seed',type=int,default=20261818)
     d.add_argument('--bootstrap-samples',type=int,default=500)
+    d=cmd.add_parser('run-e19',help='E19 controlled scale, latency, incremental graph repair, and storage benchmark')
+    d.add_argument('--out',default='results/E19')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--sizes',default=','.join(map(str,DEFAULT_SIZES)))
+    d.add_argument('--seed',type=int,default=20261919)
+    d.add_argument('--repeats',type=int,default=5)
+    d.add_argument('--certificate-time-limit',type=float,default=2.0)
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -287,6 +295,17 @@ def main(argv=None):
                 'urltrust_graph_increment_after_source_fusion':
                     a['urltrust_graph_increment_after_source_fusion'],
                 'assumption_audit':a['assumption_audit'],
+                'pass_criteria':a['pass_criteria'],
+                'runtime_seconds':a['runtime_seconds']}
+    elif args.command=='run-e19':
+        sizes=tuple(int(value) for value in args.sizes.split(','))
+        a=run_e19(args.out,args.tables,sizes,args.seed,args.repeats,
+                  args.certificate_time_limit)
+        result={'out':args.out,'status':a['status'],
+                'completed_sizes':a['completed_sizes'],
+                'skipped_sizes':a['skipped_sizes'],
+                'hardware':a['hardware'],
+                'incremental_correctness':a['incremental_correctness'],
                 'pass_criteria':a['pass_criteria'],
                 'runtime_seconds':a['runtime_seconds']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
