@@ -284,6 +284,30 @@ Writes `results/E17` with `monthly.csv`, `metrics.csv`, `summary.csv`,
 these controlled results are not field drift evidence or production latency
 measurements.
 
+### E18 - Critical ablation, sensitivity, and assumption violations
+
+`cerurl run-e18 [--cases 48 --seed 20261818 --bootstrap-samples 500]` runs
+matched controlled ablations for source ancestry, directional certificates,
+repair policy, URLTrust graph propagation, freshness, abstention, acquisition
+cost ranking, calibrated outcomes, and source-group caps. A separate full
+factorial over ancestry, directional certification, graph propagation, and
+freshness reports pairwise interactions. Sensitivity sweeps cover propagation
+alpha, evidence-fusion weight, source-group attack budget, provenance
+uncertainty, correlated-report fraction, and action-cost multiplier. Confidence
+intervals use paired bootstrap resampling over the same synthetic case IDs.
+
+The audit separately tests changed evidence weights, merged source ancestry,
+and a non-stochastic graph. A prior certificate is marked invalid when its
+proof fingerprint changes; invalid graph normalization is rejected. The
+URLTrust graph is compared with no graph after per-source aggregation and
+per-node median fusion, so this estimates graph contribution conditional on
+that explicitly defined robust-fusion baseline rather than asserting benefit.
+
+Writes `results/E18` with ablation, sensitivity, interaction, assumption,
+repair and graph-fusion tables, an audit and SHA-256 manifest, plus
+`tables/e18_ablations.tex`. Results are controlled synthetic experiments; no
+field accuracy or deployment claim follows.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -334,6 +358,7 @@ cerurl run-e14 --out results/E14 --tables tables
 cerurl run-e15 --out results/E15 --tables tables
 cerurl run-e16 --out results/E16 --tables tables
 cerurl run-e17 --out results/E17 --tables tables
+cerurl run-e18 --out results/E18 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
@@ -344,7 +369,7 @@ cerurl download-uci --out data/raw/phiusiil.csv
 cerurl train --csv data/raw/phiusiil.csv --source cer --out results/real_url_baseline --sample 20000
 ```
 
-E18-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. E16 requires its prospective input ledgers, while E17 is controlled-only in the absence of longitudinal field data. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
+E19-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. E16 requires its prospective input ledgers, while E17-E18 are controlled-only in the absence of field datasets. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
 
 ## Confirmed compromised-source quarantine
 
