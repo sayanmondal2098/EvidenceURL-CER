@@ -13,6 +13,8 @@ from .repair import repair,RepairConfig
 from .curation import curate_e01
 from .e01_sources import audit_acquired_sources
 from .e05 import run_e05
+from .e06 import run_e06
+from .e07 import run_e07
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -70,6 +72,18 @@ def main(argv=None):
     d=cmd.add_parser('run-e05',help='E05 shared-upstream provenance graph vs naive independence (controlled topologies)')
     d.add_argument('--out',default='results/E05')
     d.add_argument('--tables',default='tables')
+    d=cmd.add_parser('run-e06',help='E06 exact certificate vs exhaustive enumeration soundness check')
+    d.add_argument('--out',default='results/E06')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--cases',type=int,default=1200)
+    d.add_argument('--seed',type=int,default=20260606)
+    d=cmd.add_parser('run-e07',help='E07 MILP/LP/knapsack certificate scaling and soundness')
+    d.add_argument('--out',default='results/E07')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--sizes',default='20,50,100,500')
+    d.add_argument('--budgets',default='0,1,2,3,4,5')
+    d.add_argument('--reps',type=int,default=2)
+    d.add_argument('--time-limit',type=float,default=10.0)
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -125,6 +139,12 @@ def main(argv=None):
                 'pass_criteria':result['pass_criteria'],'controls':result['controls']}
     elif args.command=='run-e05':
         a=run_e05(args.out,args.tables); result={'out':args.out,'pass_criteria':a['pass_criteria'],'controls':a['controls']}
+    elif args.command=='run-e06':
+        a=run_e06(args.out,args.tables,args.cases,args.seed)
+        result={'out':args.out,'cases':a['cases'],'runtime_seconds':a['runtime_seconds'],'soundness':{k:a['soundness'][k] for k in ('violations','kinds')},'pass_criteria':a['pass_criteria']}
+    elif args.command=='run-e07':
+        a=run_e07(args.out,args.tables,tuple(int(x) for x in args.sizes.split(',')),tuple(int(x) for x in args.budgets.split(',')),args.reps,args.time_limit)
+        result={'out':args.out,'cases':a['cases'],'runtime_seconds':a['runtime_seconds'],'soundness':a['soundness']['violations'],'certifier_comparison':a['certifier_comparison'],'by_size':a['by_size'],'pass_criteria':a['pass_criteria']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
     elif args.command=='prepare-e04': result=prepare_e04(args.out,args.audit)

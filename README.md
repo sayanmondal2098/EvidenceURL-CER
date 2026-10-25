@@ -105,6 +105,64 @@ receipt hash are not ingested. Output is the same E01 file set plus
 
 `cerurl run-e05` builds controlled provenance topologies (shared source, independent, partial overlap, bad-data cycle, unknown ancestry, same operator, copied reports), compares "N reports = N witnesses" with source-aware independence, and writes `results/E05` (audit, summary/group/compromise CSVs, plots) and `tables/e05_independence.tex`. Cycles are flagged and collapsed; unknown ancestry is pooled into one attack unit, never counted as independent.
 
+## E06 exact certificate and exhaustive soundness
+
+`cerurl run-e06 [--cases 1200 --seed 20260606]` validates `core.certify` against an independent exact (rational-arithmetic) enumeration of every attack subset (2-15 groups; ties, abstention, overlap, shared ancestors, zero weights, dangling vertices, alpha 0 and 0.99). It writes `results/E06` (`audit.json`, `per_case_min_attack_cost.csv`, `attack_witnesses.csv`, `violations.jsonl`, `soundness_summary.png`) and `tables/e06_soundness.tex`. If any certified case is actually flipped, or the built-in unsound-certifier controls are not detected, the command raises and **withholds the tables and plots**.
+
+## E07 scaling via integer and linear programming
+
+`cerurl run-e07 [--sizes 20,50,100,500 --budgets 0,1,2,3,4,5 --reps 2 --time-limit 10]` formulates maximum descendant-coverage damage as a binary program (HiGHS via `scipy.optimize.milp`) and compares it with exhaustive enumeration (G<=20), the LP relaxation and a fractional-knapsack bound. Only upper bounds on damage can certify; the greedy attack is reported as empirical robustness only, and a timed-out solve certifies only through its valid dual bound, otherwise the case is unknown. Writes `results/E07` (`audit.json`, `results.csv`, `solver_inputs.npz`, `solver_outputs.jsonl`, `bound_tightness.png`) and `tables/e07_scaling.tex`; any unsound certificate raises and withholds plots.
+
+## Run every experiment (step by step)
+
+Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
+
+```bash
+# 0. Setup and unit tests
+python -m venv venv && venv\Scripts\activate        # Linux/macOS: source venv/bin/activate
+python -m pip install -e ".[test]"
+pytest -q
+
+# 1. Acquire authorised snapshots (needs internet; keeps hashed receipts under data/raw)
+cerurl source-registry
+cerurl acquire-sources --plan data/source_acquisition_plan.json --out data/raw --dry-run   # review first
+cerurl acquire-sources --plan data/source_acquisition_plan.json --out data/raw
+#    (Public Suffix List for eTLD+1: data/raw/public_suffix_list/public_suffix_list.dat + .receipt.json)
+
+# E01 provenance and leakage audit
+cerurl audit-e01-sources --raw-dir data/raw --out results/E01 --tables tables        # ~2 min
+#    URLTrust index + HTML archive, if you have them:
+#    cerurl curate-e01 --index database/index.sqlite --html-root database --out results/E01 --tables tables
+
+# E02 frozen-URLTrust reproduction preflight (needs E01; stays blocked without the pinned authoritative checkout)
+cerurl prepare-e02 --out results/E02 --audit results/E01/audit.json [--authoritative-dir PATH]
+
+# E03 temporal / domain-disjoint evaluation gate (fail-closed without authenticated times)
+cerurl prepare-e03 --out results/E03 --audit results/E01/audit.json
+
+# E04 assurance vs maliciousness separation audit
+cerurl prepare-e04 --out results/E04 --audit results/E01/audit.json
+
+# E05 shared-upstream source graph (controlled topologies)
+cerurl run-e05 --out results/E05 --tables tables
+
+# E06 exact certificate soundness (halts downstream plots on any violation)
+cerurl run-e06 --out results/E06 --tables tables
+
+# E07 MILP / LP scaling of exact certificates (~30 s)
+cerurl run-e07 --out results/E07 --tables tables
+
+# Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
+cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
+cerurl benchmark --data data/controlled_cases.jsonl --out results/controlled_demo --max-cases 60 --budgets 0,1,2
+
+# Optional real URL-only baseline (see sections above)
+cerurl download-uci --out data/raw/phiusiil.csv
+cerurl train --csv data/raw/phiusiil.csv --source cer --out results/real_url_baseline --sample 20000
+```
+
+E08-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
+
 ## Confirmed compromised-source quarantine
 
 ```bash

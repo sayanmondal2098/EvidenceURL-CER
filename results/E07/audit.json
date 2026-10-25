@@ -1,0 +1,112 @@
+{
+  "audit_version": "E07-1",
+  "budgets": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "by_size": {
+    "20": {
+      "cases": 72,
+      "certified_by_knapsack": 15,
+      "certified_by_lp": 15,
+      "certified_by_milp_bound": 16,
+      "fraction_timed_out": 0.0,
+      "greedy_empirically_robust_but_not_milp_certified": 0,
+      "max_milp_seconds": 0.0339,
+      "max_rss_mb": 165.306368,
+      "median_milp_seconds": 0.0097,
+      "timed_out": 0
+    },
+    "50": {
+      "cases": 72,
+      "certified_by_knapsack": 26,
+      "certified_by_lp": 27,
+      "certified_by_milp_bound": 31,
+      "fraction_timed_out": 0.0,
+      "greedy_empirically_robust_but_not_milp_certified": 0,
+      "max_milp_seconds": 0.0757,
+      "max_rss_mb": 171.094016,
+      "median_milp_seconds": 0.0129,
+      "timed_out": 0
+    },
+    "100": {
+      "cases": 72,
+      "certified_by_knapsack": 30,
+      "certified_by_lp": 30,
+      "certified_by_milp_bound": 30,
+      "fraction_timed_out": 0.0,
+      "greedy_empirically_robust_but_not_milp_certified": 0,
+      "max_milp_seconds": 0.1058,
+      "max_rss_mb": 177.74592,
+      "median_milp_seconds": 0.0157,
+      "timed_out": 0
+    },
+    "500": {
+      "cases": 72,
+      "certified_by_knapsack": 61,
+      "certified_by_lp": 61,
+      "certified_by_milp_bound": 61,
+      "fraction_timed_out": 0.0,
+      "greedy_empirically_robust_but_not_milp_certified": 0,
+      "max_milp_seconds": 2.6048,
+      "max_rss_mb": 314.114048,
+      "median_milp_seconds": 0.0771,
+      "timed_out": 0
+    }
+  },
+  "cases": 288,
+  "certifier_comparison": {
+    "knap": {
+      "certified": 132,
+      "false_unprotected": 6,
+      "false_unprotected_rate": 0.0435,
+      "unsound": 0
+    },
+    "lp": {
+      "certified": 133,
+      "false_unprotected": 5,
+      "false_unprotected_rate": 0.0362,
+      "unsound": 0
+    },
+    "milp": {
+      "certified": 138,
+      "false_unprotected": 0,
+      "false_unprotected_rate": 0.0,
+      "unsound": 0
+    }
+  },
+  "enumeration_cases": 72,
+  "formulation": "binary program with cover, shared-ancestor consistency (y>=x), cost budget; see module docstring",
+  "limitations": [
+    "Controlled synthetic instances; propagation coefficients come from a random fixed graph.",
+    "Greedy attack is an optimistic lower bound and never a guarantee.",
+    "Instances with G>20 are checked against the MILP optimum, not independent enumeration.",
+    "Memory is the process peak working set (cumulative over the run, so not per-case); null when unavailable."
+  ],
+  "max_optimality_gap": 5.551115123125783e-17,
+  "pass_criteria": {
+    "all_conservative_certificates_sound": true,
+    "status": "pass"
+  },
+  "reference_for_soundness": "exhaustive enumeration when G<=20, otherwise proven-optimal MILP; timed-out instances are excluded from the exact reference but still checked for bound validity only where a reference exists",
+  "runtime_seconds": 29.13,
+  "seed": 20260707,
+  "sizes": [
+    20,
+    50,
+    100,
+    500
+  ],
+  "solver": "scipy.optimize.milp (HiGHS), mip_rel_gap=0; no licensed solver used",
+  "soundness": {
+    "first": [],
+    "violations": 0
+  },
+  "time_limit_seconds": 10.0,
+  "timeout_policy": "a timeout may certify only through HiGHS's dual bound; if no valid bound exists the case is unknown/not certified",
+  "world_type": "controlled_synthetic"
+}

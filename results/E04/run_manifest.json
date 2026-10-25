@@ -16,9 +16,9 @@
     "Controlled cases validate representation/invariants only and are not empirical maliciousness or calibration results.",
     "K is not available for the PhiUSIIL URL/label-only cohort."
   ],
-  "phiusiil_records_without_attestation": 235795,
+  "phiusiil_records_without_attestation": 1123906,
   "prohibited_inference": "signature validity is assurance of artifact provenance/integrity only, never website benignness",
   "real_attested_observations": 0,
-  "run_at": "2026-10-14T10:35:32Z",
+  "run_at": "2026-10-25T06:32:48Z",
   "run_status": "PARTIAL_CONTROLLED_INVARIANT_ONLY"
 }

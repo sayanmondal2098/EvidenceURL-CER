@@ -1,0 +1,72 @@
+{
+  "assumptions": [
+    "fixed row-stochastic P; dangling vertices modelled as absorbing self-loops",
+    "fixed intrinsic weights, per-node sum one, weights/values in [0,1]",
+    "attacker controls <= b ancestor groups with all-descendant control; controlled values arbitrary in [0,1] (0/1 extremes optimal by linearity, interior values sampled)",
+    "graph, weights, ancestry, thresholds unchanged; no graph-perturbation budget (graph_l1_budget=0)",
+    "supported: 2..15 source groups; exhaustive over all sizes when <=10 groups, sizes <=4 above",
+    "flip = any change of original actionable verdict, abstention included; abstain verdicts are never certifiable"
+  ],
+  "audit_version": "E06-1",
+  "cases": 1200,
+  "certified_cases_by_budget": {
+    "0": 716,
+    "1": 173,
+    "2": 47,
+    "3": 5,
+    "4": 0
+  },
+  "checks_per_budget": {
+    "analytic_mismatch": 0,
+    "bound_not_enclosing": 0,
+    "certified_calls": 941,
+    "checks": 5724,
+    "exact_damage_mismatch": 0,
+    "fallback_not_conservative": 0,
+    "float_tie_disagreement": 0
+  },
+  "coverage": {
+    "abstain": 330,
+    "alpha0": 240,
+    "alpha_ge_099": 240,
+    "cases": 1200,
+    "dangling_absorbing": 761,
+    "groups_max": 15,
+    "groups_min": 2,
+    "overlap_multi_ancestor": 1157,
+    "shared_ancestor_across_nodes": 1152,
+    "ties": 172,
+    "zero_weight_obs": 1119
+  },
+  "detector_controls": {
+    "detected": true,
+    "mutant_violations": {
+      "budget_minus_one": 829,
+      "first_ancestor_only": 10
+    }
+  },
+  "limitations": [
+    "Controlled synthetic instances, not real provenance.",
+    "Certificate semantics are restricted to the stated threat model; no claim under changed graph, weights or ancestry.",
+    "Exactness for >10 groups is limited to attack sizes <=4; larger costs are reported as lower bounds."
+  ],
+  "min_attack_cost": {
+    "cases_with_cost_and_cert_lb": 870,
+    "cases_with_exact_cost": 870,
+    "cert_lb_equals_exact": 707,
+    "cert_lb_never_exceeds_exact": true
+  },
+  "pass_criteria": {
+    "detector_controls_fire": true,
+    "status": "pass",
+    "zero_violations": true
+  },
+  "runtime_seconds": 10.499,
+  "seed": 20260606,
+  "soundness": {
+    "first_violations": [],
+    "kinds": [],
+    "violations": 0
+  },
+  "world_type": "controlled_synthetic"
+}
