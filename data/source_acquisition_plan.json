@@ -4,8 +4,8 @@
     {
       "source_id": "phiusiil",
       "enabled": true,
-      "local_artifact_path": "data/raw/phiusiil.csv",
-      "release_id": "prepared local CER mapping CSV; source UCI ID 967 archive is intentionally not acquired",
+      "filename": "phiusiil_uci967.zip",
+      "release_id": "official UCI ID 967 archive; pin hash and Last-Modified receipt",
       "authorisation": {
         "acquisition_authorized_by_user": true,
         "terms_reference": "https://archive.ics.uci.edu/dataset/967/phiusiil+phishing+url+dataset"
@@ -23,7 +23,7 @@
     },
     {
       "source_id": "phishingeval",
-      "enabled": true,
+      "enabled": false,
       "release_id": "Zenodo record 14804193 v3; selected core data artifacts",
       "authorisation": {
         "acquisition_authorized_by_user": true,
@@ -107,6 +107,57 @@
       "authorisation": {
         "acquisition_authorized_by_user": true,
         "terms_reference": "https://tranco-list.eu/"
+      }
+    },
+    {
+      "source_id": "openphish",
+      "enabled": true,
+      "filename": "feed.txt",
+      "release_id": "community feed snapshot; pin Last-Modified and hash",
+      "user_agent": "EvidenceURL-CER/1.0 research-contact@example.invalid",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://openphish.com/phishing_feeds.html"
+      }
+    },
+    {
+      "source_id": "urlhaus",
+      "enabled": true,
+      "filename": "csv_recent.csv",
+      "release_id": "recent URLs CSV snapshot; pin hash",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://urlhaus.abuse.ch/api/"
+      }
+    },
+    {
+      "source_id": "phishing_database",
+      "enabled": true,
+      "filename": "phishing-links-ACTIVE.txt",
+      "release_id": "master branch file snapshot; pin hash",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://github.com/mitchellkrogza/Phishing.Database"
+      }
+    },
+    {
+      "source_id": "majestic_million",
+      "enabled": true,
+      "filename": "majestic_million.csv",
+      "release_id": "latest list is mutable; pin Last-Modified and hash",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://majestic.com/reports/majestic-million"
+      }
+    },
+    {
+      "source_id": "umbrella",
+      "enabled": true,
+      "filename": "umbrella-top-1m.csv.zip",
+      "release_id": "latest list is mutable; pin Last-Modified and hash",
+      "authorisation": {
+        "acquisition_authorized_by_user": true,
+        "terms_reference": "https://umbrella.cisco.com/blog/cisco-umbrella-1-million"
       }
     },
     {

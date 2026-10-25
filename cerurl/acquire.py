@@ -12,6 +12,7 @@ import os
 import sys
 import time
 import urllib.request
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -25,6 +26,11 @@ DEFAULT_URLS={
     "phishtank":"https://data.phishtank.com/data/online-valid.csv",
     "phishingeval":"https://github.com/Fujiaoji/PhishingEval/archive/refs/heads/main.zip",
     "tranco":"https://tranco-list.eu/top-1m.csv.zip",
+    "openphish":"https://openphish.com/feed.txt",
+    "urlhaus":"https://urlhaus.abuse.ch/downloads/csv_recent/",
+    "phishing_database":"https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/phishing-links-ACTIVE.txt",
+    "majestic_million":"https://downloads.majestic.com/majestic_million.csv",
+    "umbrella":"https://s3-us-west-1.amazonaws.com/umbrella-static/top-1m.csv.zip",
 }
 
 
@@ -176,8 +182,30 @@ def acquire_sources(plan_path: str, out_dir: str="data/acquired", dry_run: bool=
         actual_md5=_md5(temporary)
         if expected_md5 and actual_md5.lower()!=str(expected_md5).lower():
             temporary.unlink(); refused.append({"source_id":source_id,"artifact_id":item.get("artifact_id"),"reason":"downloaded_artifact_md5_mismatch"}); emit(f"{source_id}/{item.get('artifact_id', filename)}: REJECTED (MD5 mismatch)"); continue
-        temporary.replace(target)
-        receipt={"source_id":source_id,"artifact_id":item.get("artifact_id"),"source_registry_url":SOURCE_IDS[source_id]["url"],"download_url":url,"acquired_at":datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00","Z"),"artifact_path":str(target),"sha256":_sha(target),"md5":actual_md5,"expected_md5":expected_md5,"bytes":target.stat().st_size,"headers":headers,"authorisation":auth,"crawl_id":item.get("crawl_id"),"release_id":item.get("release_id"),"restricted_access_receipt_path":item.get("restricted_access_receipt_path")}
+        archive_sha256=None; extracted_from=None
+        if item.get("extract_csv",True) and zipfile.is_zipfile(temporary):
+            try:
+                with zipfile.ZipFile(temporary) as archive:
+                    members=[m for m in archive.infolist() if not m.is_dir()]
+                    if len(members)==1 and members[0].filename.lower().endswith(".csv"):
+                        member=members[0]
+                        csv_name=filename[:-4] if filename.lower().endswith(".csv.zip") else _safe_name(member.filename,source_id)
+                        csv_target=(root/source_id/csv_name).resolve()
+                        csv_temporary=csv_target.with_suffix(csv_target.suffix+".part")
+                        archive_sha256=_sha(temporary)
+                        with archive.open(member) as src, csv_temporary.open("wb") as dst:
+                            while True:
+                                block=src.read(1024*1024)
+                                if not block: break
+                                dst.write(block)
+                        csv_temporary.replace(csv_target)
+                        extracted_from=f"{filename} ({member.filename})"; target=csv_target
+                        emit(f"{source_id}/{item.get('artifact_id', filename)}: extracted CSV -> {csv_target.name}")
+                if extracted_from: temporary.unlink(); temporary=csv_target
+            except (zipfile.BadZipFile, OSError) as exc:
+                emit(f"{source_id}/{item.get('artifact_id', filename)}: CSV extraction skipped ({type(exc).__name__}); keeping archive")
+        if extracted_from is None: temporary.replace(target)
+        receipt={"archive_sha256":archive_sha256,"extracted_from":extracted_from,"source_id":source_id,"artifact_id":item.get("artifact_id"),"source_registry_url":SOURCE_IDS[source_id]["url"],"download_url":url,"acquired_at":datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00","Z"),"artifact_path":str(target),"sha256":_sha(target),"md5":actual_md5,"expected_md5":expected_md5,"bytes":target.stat().st_size,"headers":headers,"authorisation":auth,"crawl_id":item.get("crawl_id"),"release_id":item.get("release_id"),"restricted_access_receipt_path":item.get("restricted_access_receipt_path")}
         receipt_path=target.with_suffix(target.suffix+".receipt.json"); receipt_path.write_text(json.dumps(receipt,indent=2)+"\n",encoding="utf-8"); receipts.append({"source_id":source_id,"status":"acquired","receipt":str(receipt_path),"sha256":receipt["sha256"]}); emit(f"{source_id}/{item.get('artifact_id', filename)}: ACQUIRED sha256={receipt['sha256'][:12]}…")
     result={"plan":str(plan_file),"out":str(root),"dry_run":dry_run,"only":sorted(only) if only else None,"acquired":receipts,"refused":refused}
     (root/"acquisition_manifest.json").write_text(json.dumps(result,indent=2)+"\n",encoding="utf-8")
