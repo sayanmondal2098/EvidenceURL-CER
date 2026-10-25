@@ -223,6 +223,47 @@ SHA-256 manifest, plus `tables/e15_certificates.tex`. These are controlled
 synthetic cases; timings are local benchmark measurements, not a production
 latency guarantee.
 
+### E16 - Prospective first-seen and external-source evaluation
+
+`cerurl run-e16` evaluates already-frozen scores from five systems:
+`urltrust_frozen`, `feature_only`, `provenance_fusion`, `certificate_only`,
+and `full_cer`. It does not fetch feeds, visit URLs, train the systems, or
+claim that a URLTrust reproduction exists. Supply four separate ledgers under
+`data/E16` (or use the corresponding CLI path options):
+
+* `cohorts.csv`: `case_id,partition,decision_at,source_id,domain_id,campaign_id,infrastructure_id`;
+  partitions are `train,calibration,test,external` in chronological order.
+* `predictions.csv`: `case_id,system,probability_phishing,access_status,signal_count,evidence_cost,latency_ms`;
+  one row per system and non-training case, with identical evidence cost across
+  systems for each case. An inaccessible observation must have a blank score
+  and zero signals; it is not counted as a false negative.
+* `labels.csv`: `case_id,label,verified_at,adjudication_source,independent,benign_screened`;
+  labels must be independently adjudicated no earlier than the decision, and
+  benign cases require independent screening. Keep this ledger unavailable to
+  prediction generation.
+* `feed_events.csv`: `case_id,feed_source,snapshot_received_at,snapshot_path,snapshot_sha256`;
+  each row records a positive feed listing, its exact local receipt time, and a
+  path to the retained snapshot bytes (relative paths resolve beside this CSV).
+  The evaluator verifies those bytes against the recorded SHA-256. A missing
+  listing is never treated as benign or as proof of first-seen status.
+
+Use opaque case/domain/campaign identifiers rather than raw URLs. Freeze
+predictions before the evaluator joins labels, feed receipts, or test identity
+metadata. Training-domain, campaign, and infrastructure novelty are reported
+separately; strict novelty requires no training match on any of those IDs.
+The external partition must be chronologically later and have source and
+domain IDs disjoint from the other partitions. Calibration-only thresholds
+choose the operating point at the requested maximum FPR (`--max-fpr`, default
+0.01). Outputs include first-seen AUPRC, TPR/FPR, campaign-group bootstrap
+intervals, selective risk/coverage, evidence cost, latency, eligibility, and
+an error taxonomy that separates inaccessible/no-signal cases from model
+errors. `--bootstrap-samples` and `--seed` control the group bootstrap.
+
+Without all four input ledgers, `cerurl run-e16` writes an explicit
+`NOT_RUN_INPUTS_MISSING` audit and no performance metrics. Results from this
+evaluator are empirical only for the supplied, receipt-backed cohort; it does
+not validate unaudited collection or reproduce PhishLumos/URL2Path.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -271,6 +312,7 @@ cerurl run-e12 --out results/E12 --tables tables
 cerurl run-e13 --out results/E13 --tables tables
 cerurl run-e14 --out results/E14 --tables tables
 cerurl run-e15 --out results/E15 --tables tables
+cerurl run-e16 --out results/E16 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42

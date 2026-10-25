@@ -23,6 +23,7 @@ from .e12 import run_e12
 from .e13 import DEFAULT_BUDGETS, run_e13
 from .e14 import DEFAULT_E14_BUDGETS, run_e14
 from .e15 import run_e15
+from .e16 import run_e16
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -138,6 +139,16 @@ def main(argv=None):
     d.add_argument('--tables',default='tables')
     d.add_argument('--cases',type=int,default=30)
     d.add_argument('--seed',type=int,default=20261515)
+    d=cmd.add_parser('run-e16',help='E16 prospective first-seen and external-source evaluation')
+    d.add_argument('--out',default='results/E16')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--cohorts',default='data/E16/cohorts.csv')
+    d.add_argument('--predictions',default='data/E16/predictions.csv')
+    d.add_argument('--labels',default='data/E16/labels.csv')
+    d.add_argument('--feed-events',default='data/E16/feed_events.csv')
+    d.add_argument('--max-fpr',type=float,default=0.01)
+    d.add_argument('--bootstrap-samples',type=int,default=500)
+    d.add_argument('--seed',type=int,default=20261616)
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -236,6 +247,14 @@ def main(argv=None):
                 'invalidated_updates':a['invalidated_updates'],
                 'stale_certificate_retention_rate':a['stale_certificate_retention_rate'],
                 'median_incremental_speedup':a['median_incremental_speedup'],
+                'pass_criteria':a['pass_criteria']}
+    elif args.command=='run-e16':
+        a=run_e16(args.out,args.tables,args.cohorts,args.predictions,args.labels,
+                  args.feed_events,args.max_fpr,args.bootstrap_samples,args.seed)
+        result={'out':args.out,'status':a['status'],'metrics_reported':a['metrics_reported']
+                if 'metrics_reported' in a else True,
+                'first_seen_feed_cases':a.get('first_seen_feed_cases',0),
+                'strict_novel_first_seen_cases':a.get('strict_novel_first_seen_cases',0),
                 'pass_criteria':a['pass_criteria']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
