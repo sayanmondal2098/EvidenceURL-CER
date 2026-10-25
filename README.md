@@ -121,6 +121,9 @@ receipt hash are not ingested. Output is the same E01 file set plus
 
 `cerurl run-e09 [--cases 240 --seed 20260909]` compromises b=0..5 root source groups (and separately 0-40% of groups) in controlled worlds with known ancestry. A compromised group controls every descendant artifact (value forced to the goal extreme, reported weight x3, +2 mirrors) but not the graph, thresholds, audited registry or other groups. It runs untargeted, targeted-hide (phishing->benign) and targeted-FP (benign->malicious) goals under black/grey/white-box knowledge and compares a feature score, a source-unaware URLTrust surrogate, source-unaware median fusion, provenance-aware fusion, certificate-only and full CER at equal budgets. Writes `results/E09` (`audit.json`, `state_results.csv`, `summary.csv`, `attack_success_vs_budget.png`, `population_fraction.png`) and `tables/e09_resilience.tex`; any certificate/consistency failure raises and withholds plots. Certificates give verdict stability, not correctness, and clean accuracy is always reported next to attack success, never as resilience.
 
+### E10 - Evidence replay, staleness and storage tampering
+
+`cerurl run-e10 [--n-per 150 --seed 20261010]` builds time-versioned, hash-chained evidence manifests (HMAC-SHA256 per collector; a symmetric stand-in for real signatures) and runs 26 scenarios: unsigned, wrong-key, correctly signed but stale/replayed, post-signature byte/metadata/redirect-chain changes, log truncation/reorder, feed entries available after prediction time, and missing or invented capture times. A valid signature is never treated as proof of truthful remote content; stale signed evidence is rejected by policy (24 h max age, 300 s skew). Writes `results/E10` (`audit.json`, `verification_results.csv`, `scenario_summary.csv`, `tamper_detection.png`) and `tables/e10_tamper.tex`, reporting detection and false reject/accept rates, stale-acceptance, repair decisions, p50/p95 verification latency and certificate-invalidation time. Residual undetectable cases (signed false content from a compromised collector, in-window replay with no newer known version) are reported as accepted, not as detections. Data are synthetic and the decision impact uses a toy marker classifier.
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -163,6 +166,7 @@ cerurl run-e07 --out results/E07 --tables tables
 cerurl run-e08 --out results/E08 --tables tables
 # E09 source-compromise / malicious-feed injection resilience (~2 min)
 cerurl run-e09 --out results/E09 --tables tables
+cerurl run-e10 --out results/E10 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
@@ -173,7 +177,7 @@ cerurl download-uci --out data/raw/phiusiil.csv
 cerurl train --csv data/raw/phiusiil.csv --source cer --out results/real_url_baseline --sample 20000
 ```
 
-E10-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
+E11-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
 
 ## Confirmed compromised-source quarantine
 

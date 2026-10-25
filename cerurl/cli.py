@@ -17,6 +17,7 @@ from .e06 import run_e06
 from .e07 import run_e07
 from .e08 import run_e08
 from .e09 import run_e09
+from .e10 import run_e10
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -96,6 +97,11 @@ def main(argv=None):
     d.add_argument('--tables',default='tables')
     d.add_argument('--cases',type=int,default=240)
     d.add_argument('--seed',type=int,default=20260909)
+    d=cmd.add_parser('run-e10',help='E10 evidence replay, staleness and storage tampering')
+    d.add_argument('--out',default='results/E10')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--n-per',type=int,default=150)
+    d.add_argument('--seed',type=int,default=20261010)
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -163,6 +169,9 @@ def main(argv=None):
     elif args.command=='run-e09':
         a=run_e09(args.out,args.tables,args.cases,args.seed)
         result={'out':args.out,'cases':a['cases'],'states':a['states'],'runtime_seconds':a['runtime_seconds'],'soundness':a['soundness'],'cross_checks':a['cross_checks'],'white_box_b2_untargeted':a['white_box_b2_untargeted'],'pass_criteria':a['pass_criteria']}
+    elif args.command=='run-e10':
+        a=run_e10(args.out,args.tables,args.n_per,args.seed)
+        result={'out':args.out,'items':a['items'],'runtime_seconds':a['runtime_seconds'],'detection':a['detection'],'decision_impact':a['decision_impact'],'latency_ms':a['latency_ms'],'time_to_certificate_invalidation':a['time_to_certificate_invalidation'],'pass_criteria':a['pass_criteria']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
     elif args.command=='prepare-e04': result=prepare_e04(args.out,args.audit)
