@@ -339,6 +339,40 @@ against a full solve on each measured graph. The implementation still walks
 the full sparse graph each iteration; it does not claim a localized-subgraph
 complexity improvement.
 
+### E20 - Offline reproducibility and final scientific report
+
+`cerurl run-e20` never downloads mutable feeds. It verifies acquired-source
+receipt hashes and existing E01-E19 result manifests, inventories and hashes
+archived artifacts, writes a dataset/source-terms release manifest, records
+blocked or missing experiments, and generates publication status/hypothesis
+tables, a hypothesis-effect figure, `paper_sections.tex`, and an issue log.
+The default performs five deterministic-seed *controlled* replays of E06,
+E13, and E18 under `results/E20/seed_replays`; the fixed seed list and
+analysis plan are written before those replays. Use
+`--seed-runs 0` for an archive-only hash audit, or an integer of at least five
+for the preregistered replay comparisons. Example:
+
+```bash
+cerurl run-e20 --out results/E20 --tables tables --seed-runs 5
+```
+
+The preregistration applies to the new E20 replays only. E01-E19 outcomes
+already existed and are exploratory/retrospective. E20 reports synthetic
+case-cluster bootstrap intervals and Holm-adjusted paired tests only for its
+two registered synthetic contrasts; campaign/source-cluster inference is
+unavailable because those identifiers are not present. It does not retrofit
+confidence intervals onto historical summaries. E02/E03 remain blocked by
+missing authoritative model/temporal split inputs, E16 remains not-run without
+prospective ledgers, and acquisition authorization is not treated as
+redistribution permission. E20 does not copy raw acquired datasets.
+
+The frozen manifest pins local bytes and receipts, software versions, seeds,
+budgets, policies, run IDs, and hashes. Missing external splits are explicitly
+marked unavailable rather than synthesized. Figures from earlier experiments
+are hash-linked; E20 only claims to regenerate its own summary figures/tables
+from archived outputs. See `results/E20/issue_log.jsonl` for persistent
+reproduction and licensing blockers.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -391,6 +425,7 @@ cerurl run-e16 --out results/E16 --tables tables
 cerurl run-e17 --out results/E17 --tables tables
 cerurl run-e18 --out results/E18 --tables tables
 cerurl run-e19 --out results/E19 --tables tables
+cerurl run-e20 --out results/E20 --tables tables --seed-runs 5
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
@@ -401,7 +436,7 @@ cerurl download-uci --out data/raw/phiusiil.csv
 cerurl train --csv data/raw/phiusiil.csv --source cer --out results/real_url_baseline --sample 20000
 ```
 
-E20 remains a protocol item in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and has no runnable command yet. E16 requires its prospective input ledgers, while E17-E19 are controlled-only in the absence of field datasets. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
+E16 requires its prospective input ledgers, while E17-E20 controlled replays do not replace field datasets. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
 
 ## Confirmed compromised-source quarantine
 

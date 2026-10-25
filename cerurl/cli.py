@@ -27,6 +27,7 @@ from .e16 import run_e16
 from .e17 import run_e17
 from .e18 import run_e18
 from .e19 import DEFAULT_SIZES, run_e19
+from .e20 import run_e20
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -173,6 +174,13 @@ def main(argv=None):
     d.add_argument('--seed',type=int,default=20261919)
     d.add_argument('--repeats',type=int,default=5)
     d.add_argument('--certificate-time-limit',type=float,default=2.0)
+    d=cmd.add_parser('run-e20',help='E20 offline reproducibility, preregistered synthetic replays, and final report')
+    d.add_argument('--out',default='results/E20')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--seed-runs',type=int,default=5,help='Use 0 for archive-only audit or at least 5 for confirmatory replays')
+    d.add_argument('--seed-base',type=int,default=20262020)
+    d.add_argument('--e06-cases',type=int,default=1200)
+    d.add_argument('--replay-cases',type=int,default=12)
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -307,6 +315,18 @@ def main(argv=None):
                 'hardware':a['hardware'],
                 'incremental_correctness':a['incremental_correctness'],
                 'pass_criteria':a['pass_criteria'],
+                'runtime_seconds':a['runtime_seconds']}
+    elif args.command=='run-e20':
+        a=run_e20(args.out,args.tables,args.seed_runs,args.seed_base,
+                  args.e06_cases,args.replay_cases)
+        result={'out':args.out,'status':a['status'],
+                'reproducibility_status':a['reproducibility_status'],
+                'archived_experiments':a['archived_experiments'],
+                'archived_status_counts':a['archived_status_counts'],
+                'result_manifest_failures':a['result_manifest_failures'],
+                'data_release_hash_verification_pass':a['data_release_hash_verification_pass'],
+                'seed_replay_count':a['seed_replays']['seed_runs_requested'],
+                'confirmatory_hypotheses':a['confirmatory_hypotheses'],
                 'runtime_seconds':a['runtime_seconds']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
