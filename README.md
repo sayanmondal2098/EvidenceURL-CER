@@ -95,6 +95,16 @@ upstream source.  It does not import external threat feeds; those require a
 separately retained, authorised snapshot and provenance record before they can
 be added to an E01 run.
 
+For the receipt-backed snapshots under `data/raw` (PhiUSIIL, PhishTank, OpenPhish,
+Phishing.Database, URLhaus; popularity lists as context only; Public Suffix List for
+eTLD+1), run `cerurl audit-e01-sources`. Artifacts whose bytes do not match their
+receipt hash are not ingested. Output is the same E01 file set plus
+`results/E01/etld_plus_one_counts.csv`.
+
+## E05 shared-upstream source graph
+
+`cerurl run-e05` builds controlled provenance topologies (shared source, independent, partial overlap, bad-data cycle, unknown ancestry, same operator, copied reports), compares "N reports = N witnesses" with source-aware independence, and writes `results/E05` (audit, summary/group/compromise CSVs, plots) and `tables/e05_independence.tex`. Cycles are flagged and collapsed; unknown ancestry is pooled into one attack unit, never counted as independent.
+
 ## Confirmed compromised-source quarantine
 
 ```bash

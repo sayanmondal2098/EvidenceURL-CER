@@ -212,7 +212,7 @@ def _tex(value):
 def _write_characteristics(tables: Path, summaries: dict):
     tex_rows=[r"\begin{tabular}{lll}",r"Cohort & characteristic & count \\",r"\hline"]
     for key, values in summaries.items():
-        for v in values: tex_rows.append(f"{_tex(v['cohort'])} & {_tex(key + ': ' + str(v['value']))} & {v['count']} \\")
+        for v in values: tex_rows.append(f"{_tex(v['cohort'])} & {_tex(key + ': ' + str(v['value']))} & {v['count']} \\\\")
     tex_rows.append(r"\end{tabular}"); (tables/"dataset_characteristics.tex").write_text("\n".join(tex_rows)+"\n",encoding="utf-8")
 
 

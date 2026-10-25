@@ -1,2 +1,6 @@
-source_group_id,operator_id,independence_claim,independence_basis,first_valid_at,last_valid_at,parent_source_group_id,authority,external_access_terms
-phiusiil_uci_967,UCI_dataset_publisher_unverified_local_copy,one_dataset_group_not_independent_per_row,all labels derive from one static dataset,,,,local_copy_of_UCI_dataset_unverified_against_upstream,CC_BY_4.0_claimed_in_project_README; verify upstream before redistribution
+source_group_id,operator_id,independence_claim,independence_basis,first_valid_at,last_valid_at,parent_source_group_id
+phiusiil,phiusiil,ancestry_unverified,no documented upstream lineage in snapshot,,2026-10-14T14:05:28Z,
+phishtank,phishtank,ancestry_unverified,no documented upstream lineage in snapshot,,2026-10-14T14:05:36Z,
+openphish,openphish,ancestry_unverified,no documented upstream lineage in snapshot,,2026-10-14T14:05:41Z,
+phishing_database,phishing_database,ancestry_unverified,no documented upstream lineage in snapshot,,2026-10-14T14:05:59Z,
+urlhaus,urlhaus,ancestry_unverified,no documented upstream lineage in snapshot,,2026-10-14T14:05:42Z,

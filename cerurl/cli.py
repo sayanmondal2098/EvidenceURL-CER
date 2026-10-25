@@ -11,6 +11,8 @@ from .html_artifacts import extract_manifest
 from .feeds import import_snapshot
 from .repair import repair,RepairConfig
 from .curation import curate_e01
+from .e01_sources import audit_acquired_sources
+from .e05 import run_e05
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -60,6 +62,14 @@ def main(argv=None):
     d.add_argument('--tables',default='tables')
     d.add_argument('--decisions',help='Optional CSV with url,decision_at for post-decision graph-edge checks')
     d.add_argument('--source-schema',choices=['auto','urltrust','phiusiil','cer_binary'],default='auto',help='Documented input label convention; auto only recognises these schemas')
+    d=cmd.add_parser('audit-e01-sources',help='E01 audit over receipt-backed acquired snapshots under data/raw')
+    d.add_argument('--raw-dir',default='data/raw')
+    d.add_argument('--out',default='results/E01')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--psl',help='Public Suffix List file (default: data/raw/public_suffix_list/public_suffix_list.dat)')
+    d=cmd.add_parser('run-e05',help='E05 shared-upstream provenance graph vs naive independence (controlled topologies)')
+    d.add_argument('--out',default='results/E05')
+    d.add_argument('--tables',default='tables')
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -109,6 +119,12 @@ def main(argv=None):
         result=curate_e01(args.index,args.html_root,args.out,args.tables,args.decisions,args.source_schema)
         result={'out':args.out,'tables':args.tables,'flow':result['flow'],
                 'pass_criteria':result['pass_criteria'],'controls':result['controls']}
+    elif args.command=='audit-e01-sources':
+        result=audit_acquired_sources(args.raw_dir,args.out,args.tables,args.psl)
+        result={'out':args.out,'tables':args.tables,'flow':result['flow'],
+                'pass_criteria':result['pass_criteria'],'controls':result['controls']}
+    elif args.command=='run-e05':
+        a=run_e05(args.out,args.tables); result={'out':args.out,'pass_criteria':a['pass_criteria'],'controls':a['controls']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
     elif args.command=='prepare-e04': result=prepare_e04(args.out,args.audit)
