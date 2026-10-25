@@ -165,11 +165,11 @@ def make_case(rng: random.Random, idx: int) -> dict:
         for pos, (j, w) in enumerate(zip(targets, ws)):
             typ = HYPER if pos == 0 else rng.choice([HYPER, REDIR, STRUCT])
             edges.append((i, j, w / z, typ))
-    G = rng.randint(6, 8); obs = []
+    G = rng.randint(14, 18); obs = []
     level = {i: rng.random() < 0.5 for i in range(n)}
     target = rng.randrange(n); level[target] = rng.random() < 0.6
     for node in range(n):
-        k = rng.randint(4, 8); w = [0] * k
+        k = rng.randint(8, 12); w = [0] * k
         for _ in range(12): w[rng.randrange(k)] += 1
         for wi in w:
             anc = tuple(sorted(rng.sample(range(G), 1 if rng.random() < 0.85 else 2)))

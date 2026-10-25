@@ -113,6 +113,10 @@ receipt hash are not ingested. Output is the same E01 file set plus
 
 `cerurl run-e07 [--sizes 20,50,100,500 --budgets 0,1,2,3,4,5 --reps 2 --time-limit 10]` formulates maximum descendant-coverage damage as a binary program (HiGHS via `scipy.optimize.milp`) and compares it with exhaustive enumeration (G<=20), the LP relaxation and a fractional-knapsack bound. Only upper bounds on damage can certify; the greedy attack is reported as empirical robustness only, and a timed-out solve certifies only through its valid dual bound, otherwise the case is unknown. Writes `results/E07` (`audit.json`, `results.csv`, `solver_inputs.npz`, `solver_outputs.jsonl`, `bound_tightness.png`) and `tables/e07_scaling.tex`; any unsound certificate raises and withholds plots.
 
+## E08 joint source and typed-graph attacks
+
+`cerurl run-e08 [--cases 96 --seed 20260808]` adds typed graph perturbations (hyperlink insert/remove/reweight, redirects confined to the original target's site, immutable structural edges, and zero-cost semantics-preserving edits) with a second edge budget `k` (ops of step 0.1, so row-l1 `eps = min(2, 2k*0.1)`), recomputes the graph snapshot after every perturbation, and compares pure-source, pure-graph and joint attacks (exhaustive over the 22 strongest typed ops, k<=3, all source subsets b<=3, plus random continuous trials). The joint bound is the E06 source damage plus `alpha*eps/(2(1-alpha))` (induced infinity norm, row-stochastic normalisation, proof in the `e08.py` docstring); it abstains for alpha>0.95, vacuous graph terms, or out-of-type/non-stochastic graphs. Writes `results/E08` (`audit.json`, `cells.csv`, `attack_witnesses.csv`, `heatmaps.png`) and `tables/e08_joint.tex`; any soundness failure raises and withholds plots.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -151,6 +155,8 @@ cerurl run-e06 --out results/E06 --tables tables
 
 # E07 MILP / LP scaling of exact certificates (~30 s)
 cerurl run-e07 --out results/E07 --tables tables
+# E08 joint source + typed-graph attacks (~20 s)
+cerurl run-e08 --out results/E08 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
@@ -161,7 +167,7 @@ cerurl download-uci --out data/raw/phiusiil.csv
 cerurl train --csv data/raw/phiusiil.csv --source cer --out results/real_url_baseline --sample 20000
 ```
 
-E08-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
+E09-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
 
 ## Confirmed compromised-source quarantine
 
