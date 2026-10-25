@@ -74,7 +74,7 @@ These prompts are intended for sequential use with a coding/research agent. **Co
 
 **Agent prompt:** For each incorrectly decided/fragile URL, derive counterfactual challenges identifying which source group, evidence type, or graph relation would need to change to reverse the verdict. For small controlled cases solve exact minimal-change counterfactuals; for larger cases use a constrained heuristic with an admissibility check. Compare counterfactual sets against random, gradient attribution, feature importance and disagreement. Measure overlap with real injected attack ground truth and number of attempts needed to expose the compromise. Disallow direct access to the held-out attack seed and true unobserved action outcome during challenge selection.
 
-**Outputs:** challenge validity, precision/recall of vulnerable groups, minimality gap, top-k attack localization, runtime, false counterfactual claims. **Pass:** identified counterfactuals are feasible under the model; only exact or provably bounded cases receive corresponding guarantees.
+**Outputs:** challenge validity, precision/recall of vulnerable groups, minimality gap, top-k attack localization, runtime, false counterfactual claims. **Pass:** identified counterfactuals are feasible under the model; only exact or provably bounded cases receive corresponding guarantees. ==== RETRY
 
 ## E13. Repair action selection against matched-budget baselines
 

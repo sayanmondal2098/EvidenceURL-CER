@@ -19,6 +19,7 @@ from .e08 import run_e08
 from .e09 import run_e09
 from .e10 import run_e10
 from .e11 import run_e11
+from .e12 import run_e12
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -110,6 +111,11 @@ def main(argv=None):
     d.add_argument('--seed',type=int,default=20261111)
     d.add_argument('--budgets',default='1,3,5',help='Common attempt budgets, including the first observation')
     d.add_argument('--no-plots',action='store_true')
+    d=cmd.add_parser('run-e12',help='E12 admissible counterfactual challenges and attack localization')
+    d.add_argument('--out',default='results/E12')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--cases',type=int,default=120)
+    d.add_argument('--seed',type=int,default=20261212)
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -184,6 +190,11 @@ def main(argv=None):
         a=run_e11(args.out,args.tables,args.n_per,args.seed,tuple(int(x) for x in args.budgets.split(',')),plots=not args.no_plots)
         result={'out':args.out,'sites':a['sites'],'policy_trials':a['policy_trials'],
                 'runtime_seconds':a['runtime_seconds'],'summary':a['summary'],'pass_criteria':a['pass_criteria']}
+    elif args.command=='run-e12':
+        a=run_e12(args.out,args.tables,args.cases,args.seed)
+        result={'out':args.out,'cases':a['cases'],'exact_cases':a['exact_cases'],
+                'heuristic_cases':a['heuristic_cases'],'summary':a['summary'],
+                'pass_criteria':a['pass_criteria']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
     elif args.command=='prepare-e04': result=prepare_e04(args.out,args.audit)

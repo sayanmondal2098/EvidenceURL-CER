@@ -146,6 +146,21 @@ contradictions. This measures actual local HTTP collection with **emulated
 network/time conditions**, not geographically independent browsers or field
 phishing detection. See [E11 methods and metric definitions](docs/E11_CLOAKING.md).
 
+### E12 - Counterfactual challenge validity and attack localization
+
+`cerurl run-e12 [--cases 120 --seed 20261212]` evaluates counterfactual
+interventions over source groups, evidence types and graph relations in
+controlled synthetic cases. It compares exact/heuristic challenges with random
+selection, score-gradient attribution, evidence-type importance and disagreement.
+Injected vulnerable groups and labels are held by the evaluator, not passed to
+challenge selection; all reported challenges are independently reapplied to the
+model and must reverse its actionable verdict. Exhaustive minimum-cardinality
+guarantees are reported only for intervention menus of at most ten actions;
+larger cases use an admissibility-checked greedy heuristic without minimality
+guarantees. Writes `results/E12` (`audit.json`, challenge results/sets and a
+SHA-256 manifest) and `tables/e12_counterfactual.tex`. These are controlled
+simulation results, not field vulnerability estimates.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -190,6 +205,7 @@ cerurl run-e08 --out results/E08 --tables tables
 cerurl run-e09 --out results/E09 --tables tables
 cerurl run-e10 --out results/E10 --tables tables
 cerurl run-e11 --out results/E11 --tables tables
+cerurl run-e12 --out results/E12 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
