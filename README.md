@@ -264,6 +264,26 @@ Without all four input ledgers, `cerurl run-e16` writes an explicit
 evaluator are empirical only for the supplied, receipt-backed cohort; it does
 not validate unaudited collection or reproduce PhishLumos/URL2Path.
 
+### E17 - Longitudinal drift, source expiry, and certificate stability
+
+`cerurl run-e17 [--cases 64 --months 12 --seed 20261717 --calibration-seed 20161717 --periodic-interval 3]`
+replays controlled monthly cases with malicious-to-benign remediation, domain
+migration, DNS changes, certificate rotation, page cleanup, redirect mutation,
+source-reputation changes, and silent source withdrawal. It compares frozen
+static trust, periodic full refresh, freshness-only filtering, and
+certificate-guided repair using the same sealed monthly observations. Modality
+TTLs are selected on a separate controlled calibration stream and frozen
+before the evaluation trajectories.
+
+Outputs include monthly AUPRC and selective accuracy/coverage by evidence age,
+alert correction delay, refresh actions and acquisition cost, unnecessary
+repairs, graph-snapshot changes, and certificate expiry/invalidation outcomes.
+Writes `results/E17` with `monthly.csv`, `metrics.csv`, `summary.csv`,
+`calibration_ttl.csv`, `audit.json`, and a SHA-256 manifest, plus
+`tables/e17_longitudinal.tex`. No prospective longitudinal dataset is included;
+these controlled results are not field drift evidence or production latency
+measurements.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -313,6 +333,7 @@ cerurl run-e13 --out results/E13 --tables tables
 cerurl run-e14 --out results/E14 --tables tables
 cerurl run-e15 --out results/E15 --tables tables
 cerurl run-e16 --out results/E16 --tables tables
+cerurl run-e17 --out results/E17 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
@@ -323,7 +344,7 @@ cerurl download-uci --out data/raw/phiusiil.csv
 cerurl train --csv data/raw/phiusiil.csv --source cer --out results/real_url_baseline --sample 20000
 ```
 
-E12-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
+E18-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. E16 requires its prospective input ledgers, while E17 is controlled-only in the absence of longitudinal field data. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
 
 ## Confirmed compromised-source quarantine
 

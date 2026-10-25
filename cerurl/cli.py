@@ -24,6 +24,7 @@ from .e13 import DEFAULT_BUDGETS, run_e13
 from .e14 import DEFAULT_E14_BUDGETS, run_e14
 from .e15 import run_e15
 from .e16 import run_e16
+from .e17 import run_e17
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -149,6 +150,14 @@ def main(argv=None):
     d.add_argument('--max-fpr',type=float,default=0.01)
     d.add_argument('--bootstrap-samples',type=int,default=500)
     d.add_argument('--seed',type=int,default=20261616)
+    d=cmd.add_parser('run-e17',help='E17 controlled longitudinal drift, expiry, and certificate replay')
+    d.add_argument('--out',default='results/E17')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--cases',type=int,default=64)
+    d.add_argument('--months',type=int,default=12)
+    d.add_argument('--seed',type=int,default=20261717)
+    d.add_argument('--calibration-seed',type=int,default=20161717)
+    d.add_argument('--periodic-interval',type=int,default=3)
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -255,6 +264,15 @@ def main(argv=None):
                 if 'metrics_reported' in a else True,
                 'first_seen_feed_cases':a.get('first_seen_feed_cases',0),
                 'strict_novel_first_seen_cases':a.get('strict_novel_first_seen_cases',0),
+                'pass_criteria':a['pass_criteria']}
+    elif args.command=='run-e17':
+        a=run_e17(args.out,args.tables,args.cases,args.months,args.seed,
+                  args.calibration_seed,args.periodic_interval)
+        result={'out':args.out,'cases':a['cases'],'months':a['months'],
+                'policies':a['policies'],'status':a['status'],
+                'certificate_expiry_correctness':a['certificate_expiry_correctness'],
+                'stale_certificate_retained_count':a['stale_certificate_retained_count'],
+                'runtime_seconds':a['runtime_seconds'],
                 'pass_criteria':a['pass_criteria']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
