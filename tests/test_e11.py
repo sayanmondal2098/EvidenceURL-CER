@@ -72,6 +72,21 @@ def test_connection_failure_is_missing_and_charged(tmp_path):
     assert o["body_sha256"] is None and o["missing_reason"]
 
 
+def test_connection_reuse_preserves_per_request_conditions(tmp_path):
+    s = site()
+    with Testbed([s]) as server:
+        connection = HTTPConnection("127.0.0.1", server.port, timeout=3)
+        try:
+            a = collect(server.port, s.host, Action("correlated_a", 0), "reuse-a", tmp_path, connection)
+            b = collect(server.port, s.host, Action("mobile_east", 0), "reuse-b", tmp_path, connection)
+        finally:
+            connection.close()
+    assert a["observed"] == "benign" and b["observed"] == "malicious"
+    assert len({r["peer_port"] for r in server.request_log}) == 1
+    assert {r["peer_ip"] for r in server.request_log} == {"127.0.0.1"}
+    assert validate_observations([a, b], server.request_log, tmp_path) == []
+
+
 def test_isolation_and_submission_refusal(tmp_path):
     with pytest.raises(ValueError):
         collect(80, "example.com", ACTIONS[0], "bad", tmp_path)
@@ -177,6 +192,33 @@ def test_small_run_ground_truth_denominators_and_outputs(tmp_path):
 def test_invalid_budgets_refused(tmp_path, budgets):
     with pytest.raises(ValueError):
         run_e11(tmp_path, tmp_path, n_per=1, budgets=budgets)
+
+
+def test_failed_audit_withholds_stale_success_artifacts(tmp_path, monkeypatch):
+    import cerurl.e11 as experiment
+    out, tables = tmp_path / "bad", tmp_path / "tables"
+    out.mkdir()
+    tables.mkdir()
+    plot, table = out / "cloaking_exposure.png", tables / "e11_cloaking.tex"
+    plot.write_bytes(b"old plot")
+    table.write_text("old table")
+    (out / "audit.json").write_text('{"pass_criteria":{"status":"pass"}}')
+    original = experiment.collect
+
+    def poison(*args, **kwargs):
+        result = original(*args, **kwargs)
+        if not result["available"]:
+            result["observed"] = "benign"  # deliberate forbidden outage conversion
+        return result
+
+    monkeypatch.setattr(experiment, "collect", poison)
+    with pytest.raises(AssertionError, match="integrity audit failed"):
+        experiment.run_e11(out, tables, n_per=1, budgets=(1,), plots=False)
+    assert not plot.exists() and not table.exists()
+    audit = json.loads((out / "audit.json").read_text())
+    assert audit["pass_criteria"]["status"] == "fail"
+    assert any("missing_used_as_evidence" in e for e in audit["violations"])
+    assert not (out / "manifest_sha256.json").exists()
 
 
 def test_schedules_reproducible():

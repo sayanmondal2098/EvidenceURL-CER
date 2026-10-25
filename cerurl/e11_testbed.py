@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from hashlib import sha256
 from html.parser import HTMLParser
 from http.client import HTTPConnection, HTTPException
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
 import random
@@ -196,6 +196,9 @@ class Testbed:
         owner = self
 
         class Handler(BaseHTTPRequestHandler):
+            protocol_version = "HTTP/1.1"
+            disable_nagle_algorithm = True
+
             def log_message(self, *_args):
                 pass
 
@@ -229,6 +232,7 @@ class Testbed:
                     status = 200
                     body = render_page(site, state, ua, network, slot)
                 record = {"request_id": self.headers.get("X-E11-Request-ID"), "site_id": site.site_id,
+                          "peer_ip": self.client_address[0], "peer_port": self.client_address[1],
                           "path": self.path, "user_agent": ua, "network": network, "slot": slot,
                           "status": status, "location": location, "body_sha256": digest(body),
                           "server_at_utc": utc_now(), **state}
@@ -243,7 +247,7 @@ class Testbed:
                 self.end_headers()
                 self.wfile.write(body)
 
-        self.server = HTTPServer(("127.0.0.1", 0), Handler)
+        self.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         self.thread = threading.Thread(target=self.server.serve_forever, kwargs={"poll_interval": .02}, daemon=True)
         self.thread.start()
         return self
@@ -269,7 +273,8 @@ def safe_redirect(current: str, location: str, host: str) -> str:
     return target
 
 
-def collect(port: int, host: str, action: Action, request_id: str, artifact_dir: Path) -> dict:
+def collect(port: int, host: str, action: Action, request_id: str, artifact_dir: Path,
+            connection: HTTPConnection | None = None) -> dict:
     """Fetch actual bytes without DNS, proxies, JS, or external redirect following.
 
     This function receives no Site, scenario, rule, ground-truth state or future
@@ -279,14 +284,17 @@ def collect(port: int, host: str, action: Action, request_id: str, artifact_dir:
         raise ValueError("Only generated E11 .test hosts may be collected")
     if action.slot not in SLOTS or action.collector_id not in COLLECTOR_MAP:
         raise ValueError("Unknown condition")
+    if connection is not None and (connection.host != "127.0.0.1" or connection.port != port):
+        raise ValueError("Reusable connection must target this loopback testbed")
     collector = COLLECTOR_MAP[action.collector_id]
     artifact_dir.mkdir(parents=True, exist_ok=True)
     url = f"http://{host}/"
     chain, body, status, error = [], b"", None, None
     started = utc_now()
     t0 = time.perf_counter()
+    owned_connection = connection is None
+    connection = connection or HTTPConnection("127.0.0.1", port, timeout=3)
     for hop in range(4):
-        connection = HTTPConnection("127.0.0.1", port, timeout=3)
         try:
             connection.request("GET", urlsplit(url).path, headers={
                 "Host": host, "User-Agent": collector.user_agent,
@@ -311,9 +319,11 @@ def collect(port: int, host: str, action: Action, request_id: str, artifact_dir:
             url = safe_redirect(url, location, host)
         except (OSError, HTTPException, ValueError) as exc:
             error = f"{type(exc).__name__}: {exc}"
+            connection.close()
             break
         finally:
-            connection.close()
+            if owned_connection:
+                connection.close()
     else:
         error = "redirect_limit"
     observed = None if error else classify(body, status)

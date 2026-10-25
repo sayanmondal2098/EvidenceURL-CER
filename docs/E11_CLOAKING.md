@@ -17,6 +17,9 @@ The testbed binds only to `127.0.0.1` on an ephemeral port. The collector always
 connects directly to that address using `http.client`, with a generated
 `e11-00000.test`-style Host header. It does not resolve those names or use system
 HTTP proxies. Redirects are allowed only to registered paths on the same host.
+The benchmark reuses a loopback HTTP/1.1 connection to avoid exhausting Windows
+ephemeral ports. Server receipts also retain the actual peer IP and port; all
+emulated networks still use the same physical loopback connection.
 There are no external links, scripts, images, credential inputs or submission
 endpoints. POST is refused. The simulated credential-harvesting content is an
 inert HTML metadata marker and an explicitly labelled explanation.

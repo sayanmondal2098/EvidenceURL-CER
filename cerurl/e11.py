@@ -9,6 +9,8 @@ witness model; its certificate is NOT a guarantee about unseen website content.
 from __future__ import annotations
 
 from dataclasses import asdict
+from contextlib import closing
+from http.client import HTTPConnection
 import csv
 import json
 from pathlib import Path
@@ -103,7 +105,8 @@ def select_action(policy: str, history: list[dict], remaining: float, rng: rando
                     "certificate_scope": "fixed collected-witness surrogate only" if current else None}
 
 
-def run_trial(port: int, host: str, policy: str, budget: int, seed: int, artifact_dir: Path) -> list[dict]:
+def run_trial(port: int, host: str, policy: str, budget: int, seed: int, artifact_dir: Path,
+              connection: HTTPConnection | None = None) -> list[dict]:
     history = []
     rng = random.Random(seed)
     remaining, finish = float(budget), 0.0
@@ -112,7 +115,7 @@ def run_trial(port: int, host: str, policy: str, budget: int, seed: int, artifac
         if action is None:
             break
         request_id = f"{host[:-5]}:{policy}:b{budget}:{len(history)}"
-        obs = collect(port, host, action, request_id, artifact_dir)
+        obs = collect(port, host, action, request_id, artifact_dir, connection)
         finish = max(finish, action.slot * SLOT_SECONDS) + 1.0
         obs.update(policy=policy, budget=budget, step=len(history), selection=selection,
                    modeled_evidence_at_s=finish, decision_before=decision(history))
@@ -281,6 +284,9 @@ def run_e11(out_dir="results/E11", table_dir="tables", n_per=20, seed=20261111,
     out, tables = Path(out_dir), Path(table_dir)
     out.mkdir(parents=True, exist_ok=True)
     tables.mkdir(parents=True, exist_ok=True)
+    # A failed or interrupted rerun cannot leave an older success claim/plot.
+    for path in (out / "audit.json", out / "manifest_sha256.json", out / "cloaking_exposure.png", tables / "e11_cloaking.tex"):
+        path.unlink(missing_ok=True)
     artifacts = out / "artifacts"
     manifest = {"version": "E11-1", "seed": seed, "scenarios": list(SCENARIOS),
                 "sites": [asdict(s) for s in sites], "collectors": [asdict(c) for c in COLLECTORS],
@@ -291,7 +297,7 @@ def run_e11(out_dir="results/E11", table_dir="tables", n_per=20, seed=20261111,
                 "collector_mode": "actual HTTP bytes with browser UA strings; no browser rendering"}
     (out / "schedule.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     grid, sweeps, observations, trials, contradictions = [], [], [], [], []
-    with Testbed(sites) as server:
+    with Testbed(sites) as server, closing(HTTPConnection("127.0.0.1", server.port, timeout=3)) as connection:
         for i, site in enumerate(sites):
             truth = {}
             # Independent evaluator measures ALL conditions. Results are withheld
@@ -299,7 +305,7 @@ def run_e11(out_dir="results/E11", table_dir="tables", n_per=20, seed=20261111,
             for action in ACTIONS:
                 c = COLLECTOR_MAP[action.collector_id]
                 expected = site_state(site, c.user_agent, c.network, action.slot)
-                probe = collect(server.port, site.host, action, f"truth:{site.site_id}:{action.action_id}", artifacts)
+                probe = collect(server.port, site.host, action, f"truth:{site.site_id}:{action.action_id}", artifacts, connection)
                 sweeps.append(probe)
                 cell = {"site_id": site.site_id, "scenario": site.scenario, "action_id": action.action_id,
                         "slot": action.slot, "collector_id": c.collector_id, **expected,
@@ -309,7 +315,7 @@ def run_e11(out_dir="results/E11", table_dir="tables", n_per=20, seed=20261111,
                 grid.append(cell)
             for budget in budgets:
                 for policy in POLICIES:
-                    history = run_trial(server.port, site.host, policy, budget, seed + i * 1009, artifacts)
+                    history = run_trial(server.port, site.host, policy, budget, seed + i * 1009, artifacts, connection)
                     observations.extend(history)
                     row, pairs = evaluate_trial(site, history, truth, policy, budget)
                     trials.append(row)
@@ -355,6 +361,8 @@ def run_e11(out_dir="results/E11", table_dir="tables", n_per=20, seed=20261111,
              "evaluation_probe_cost": len(sweeps), "evaluation_probe_http_requests": sum(o["http_requests"] for o in sweeps),
              "policy_acquisition_cost": sum(o["acquisition_cost"] for o in observations),
              "policy_http_requests": sum(o["http_requests"] for o in observations),
+             "physical_client_connections": len({(r["peer_ip"], r["peer_port"]) for r in server_log}),
+             "transport_failures": sum(o["status"] is None for o in sweeps + observations),
              "ground_truth": "server schedule and actual response receipts; withheld from policies; no model labels",
              "decision_rule": "any acquired marker => malicious; otherwise an acquired benign template => benign; only missing => abstain",
              "contradiction_rule": "opposite semantic states at the same scheduled slot, validated against both available server states",
