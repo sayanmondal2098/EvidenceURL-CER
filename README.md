@@ -117,6 +117,10 @@ receipt hash are not ingested. Output is the same E01 file set plus
 
 `cerurl run-e08 [--cases 96 --seed 20260808]` adds typed graph perturbations (hyperlink insert/remove/reweight, redirects confined to the original target's site, immutable structural edges, and zero-cost semantics-preserving edits) with a second edge budget `k` (ops of step 0.1, so row-l1 `eps = min(2, 2k*0.1)`), recomputes the graph snapshot after every perturbation, and compares pure-source, pure-graph and joint attacks (exhaustive over the 22 strongest typed ops, k<=3, all source subsets b<=3, plus random continuous trials). The joint bound is the E06 source damage plus `alpha*eps/(2(1-alpha))` (induced infinity norm, row-stochastic normalisation, proof in the `e08.py` docstring); it abstains for alpha>0.95, vacuous graph terms, or out-of-type/non-stochastic graphs. Writes `results/E08` (`audit.json`, `cells.csv`, `attack_witnesses.csv`, `heatmaps.png`) and `tables/e08_joint.tex`; any soundness failure raises and withholds plots.
 
+## E09 source-compromise and malicious-feed injection
+
+`cerurl run-e09 [--cases 240 --seed 20260909]` compromises b=0..5 root source groups (and separately 0-40% of groups) in controlled worlds with known ancestry. A compromised group controls every descendant artifact (value forced to the goal extreme, reported weight x3, +2 mirrors) but not the graph, thresholds, audited registry or other groups. It runs untargeted, targeted-hide (phishing->benign) and targeted-FP (benign->malicious) goals under black/grey/white-box knowledge and compares a feature score, a source-unaware URLTrust surrogate, source-unaware median fusion, provenance-aware fusion, certificate-only and full CER at equal budgets. Writes `results/E09` (`audit.json`, `state_results.csv`, `summary.csv`, `attack_success_vs_budget.png`, `population_fraction.png`) and `tables/e09_resilience.tex`; any certificate/consistency failure raises and withholds plots. Certificates give verdict stability, not correctness, and clean accuracy is always reported next to attack success, never as resilience.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -157,6 +161,8 @@ cerurl run-e06 --out results/E06 --tables tables
 cerurl run-e07 --out results/E07 --tables tables
 # E08 joint source + typed-graph attacks (~20 s)
 cerurl run-e08 --out results/E08 --tables tables
+# E09 source-compromise / malicious-feed injection resilience (~2 min)
+cerurl run-e09 --out results/E09 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
@@ -167,7 +173,7 @@ cerurl download-uci --out data/raw/phiusiil.csv
 cerurl train --csv data/raw/phiusiil.csv --source cer --out results/real_url_baseline --sample 20000
 ```
 
-E09-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
+E10-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
 
 ## Confirmed compromised-source quarantine
 
