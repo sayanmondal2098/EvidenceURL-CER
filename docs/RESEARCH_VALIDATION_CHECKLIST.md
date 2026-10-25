@@ -14,6 +14,7 @@
 - [x] Corrections, degradations, coverage, abstention, cost and plotting
 - [x] Real raw-URL UCI ingestion, safe label inversion and hostname-disjoint baseline
 - [x] Offline local HTML artifact extraction without invented capture timestamps
+- [x] E11 loopback HTTP cloaking sites, recorded bytes and server ground truth, five acquisition policies, outage-aware evaluation (network identities and observation slots are emulated)
 
 ## Not implemented and required before empirical journal claims
 - [ ] Real, prospectively acquired multi-vantage website observations
@@ -23,7 +24,7 @@
 - [ ] Trust semantics for hyperlink versus redirect versus hosting relationships
 - [ ] Strict temporal and campaign-disjoint splits with label-availability ledger
 - [ ] Provenance authentication, tamper-evident append-only logging and witnesses
-- [ ] Real cloaking testbed with safe multi-vantage collection
+- [ ] Real network/device vantage deployment of the controlled cloaking testbed (E11 currently emulates these conditions over loopback HTTP)
 - [ ] Actual counterfactual collection action execution and operational measurement
 - [ ] Larger-scale certified bounds with independently validated threat constraints
 - [ ] Comparison with cited state-of-the-art robust graph and phishing systems

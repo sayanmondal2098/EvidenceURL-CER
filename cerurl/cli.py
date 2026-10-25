@@ -18,6 +18,7 @@ from .e07 import run_e07
 from .e08 import run_e08
 from .e09 import run_e09
 from .e10 import run_e10
+from .e11 import run_e11
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -102,6 +103,13 @@ def main(argv=None):
     d.add_argument('--tables',default='tables')
     d.add_argument('--n-per',type=int,default=150)
     d.add_argument('--seed',type=int,default=20261010)
+    d=cmd.add_parser('run-e11',help='E11 isolated HTTP cloaking sites, acquisition policies and ground-truth audit')
+    d.add_argument('--out',default='results/E11')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--n-per',type=int,default=20,help='Replicates per controlled scenario')
+    d.add_argument('--seed',type=int,default=20261111)
+    d.add_argument('--budgets',default='1,3,5',help='Common attempt budgets, including the first observation')
+    d.add_argument('--no-plots',action='store_true')
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -172,6 +180,10 @@ def main(argv=None):
     elif args.command=='run-e10':
         a=run_e10(args.out,args.tables,args.n_per,args.seed)
         result={'out':args.out,'items':a['items'],'runtime_seconds':a['runtime_seconds'],'detection':a['detection'],'decision_impact':a['decision_impact'],'latency_ms':a['latency_ms'],'time_to_certificate_invalidation':a['time_to_certificate_invalidation'],'pass_criteria':a['pass_criteria']}
+    elif args.command=='run-e11':
+        a=run_e11(args.out,args.tables,args.n_per,args.seed,tuple(int(x) for x in args.budgets.split(',')),plots=not args.no_plots)
+        result={'out':args.out,'sites':a['sites'],'policy_trials':a['policy_trials'],
+                'runtime_seconds':a['runtime_seconds'],'summary':a['summary'],'pass_criteria':a['pass_criteria']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
     elif args.command=='prepare-e04': result=prepare_e04(args.out,args.audit)

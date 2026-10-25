@@ -124,6 +124,28 @@ receipt hash are not ingested. Output is the same E01 file set plus
 ### E10 - Evidence replay, staleness and storage tampering
 
 `cerurl run-e10 [--n-per 150 --seed 20261010]` builds time-versioned, hash-chained evidence manifests (HMAC-SHA256 per collector; a symmetric stand-in for real signatures) and runs 26 scenarios: unsigned, wrong-key, correctly signed but stale/replayed, post-signature byte/metadata/redirect-chain changes, log truncation/reorder, feed entries available after prediction time, and missing or invented capture times. A valid signature is never treated as proof of truthful remote content; stale signed evidence is rejected by policy (24 h max age, 300 s skew). Writes `results/E10` (`audit.json`, `verification_results.csv`, `scenario_summary.csv`, `tamper_detection.png`) and `tables/e10_tamper.tex`, reporting detection and false reject/accept rates, stale-acceptance, repair decisions, p50/p95 verification latency and certificate-invalidation time. Residual undetectable cases (signed false content from a compromised collector, in-window replay with no newer known version) are reported as accepted, not as detections. Data are synthetic and the decision impact uses a toy marker classifier.
+### E11 - Multi-vantage cloaking with controlled website behaviour
+
+`cerurl run-e11 [--n-per 20 --seed 20261111 --budgets 1,3,5]` runs 14 controlled
+scenario families on isolated `.test` virtual hosts served exclusively over
+loopback HTTP. Browser user-agent strings, emulated network identities and
+scheduled logical time slots control harmless pages, inert simulated phishing
+markers, redirects and outages. It compares one-vantage, fixed three-vantage,
+random new vantage, diversity and a counterfactual CER challenge heuristic.
+All policies receive the same acquisition caps; realized costs are reported.
+Policies cannot access the server schedule or evaluator's exhaustive condition
+probes. Outages are missing evidence and still cost an attempt.
+
+Writes `results/E11` with the schedule, server request receipts, actual captured
+HTML, ground-truth/availability grid, observations, contradictions, per-trial
+and summary CSVs, paired comparisons, SHA-256 manifest, audit and exposure plot,
+plus `tables/e11_cloaking.tex`. Exposure, repairs, decision changes, false
+positives, time-to-evidence and cost use controlled server truth. Different
+benign hashes and changes between time slots are not simultaneous semantic
+contradictions. This measures actual local HTTP collection with **emulated
+network/time conditions**, not geographically independent browsers or field
+phishing detection. See [E11 methods and metric definitions](docs/E11_CLOAKING.md).
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -167,6 +189,7 @@ cerurl run-e08 --out results/E08 --tables tables
 # E09 source-compromise / malicious-feed injection resilience (~2 min)
 cerurl run-e09 --out results/E09 --tables tables
 cerurl run-e10 --out results/E10 --tables tables
+cerurl run-e11 --out results/E11 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
@@ -177,7 +200,7 @@ cerurl download-uci --out data/raw/phiusiil.csv
 cerurl train --csv data/raw/phiusiil.csv --source cer --out results/real_url_baseline --sample 20000
 ```
 
-E11-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
+E12-E20 are protocol items in `docs/EXPERIMENT_PROMPTS_E01_E20.md` and have no runnable command yet. Run order matters: E01 first (E02-E04 read `results/E01/audit.json`); run E06 before generating or publishing any certification plot from `benchmark`.
 
 ## Confirmed compromised-source quarantine
 
@@ -227,6 +250,8 @@ cerurl/core.py         fixed-graph exact/conservative source and graph certifica
 cerurl/simulate.py     transparent controlled provenance generator
 cerurl/repair.py       policy baselines and sealed-oracle action execution
 cerurl/experiments.py  adversarial enumeration, benchmark, reports and charts
+cerurl/e11.py          cloaking policies, controlled-truth evaluation and reports
+cerurl/e11_testbed.py   isolated .test HTTP sites, schedules and evidence collection
 cerurl/metrics.py      certified coverage, abstentions, corrections/degradations
 cerurl/public_data.py  official UCI downloader, label validation, URL-only ML baseline
 cerurl/real_seed.py    synthetic perturbations anchored on real held-out labels
