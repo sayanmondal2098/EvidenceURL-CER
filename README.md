@@ -203,6 +203,26 @@ Writes `results/E14` with an audit, per-trial and transition CSVs, calibration
 curves, paired/error-analysis summaries and a SHA-256 manifest, plus
 `tables/e14_decisions.tex`.
 
+### E15 - Certificate strengthening and dynamic invalidation
+
+`cerurl run-e15 [--cases 30 --seed 20261515]` applies controlled updates for
+shared-ancestor support, an independent contradiction, independent support,
+newly discovered mirrors, lost upstream independence, freshness expiration,
+graph-snapshot changes, and a no-op refresh. Every proof-input change
+invalidates the prior report. If the graph is unchanged, only the propagation
+matrix is reused; evidence-dependent scores, directional bounds, and
+certification are rebuilt and cross-checked against a full recomputation.
+Expired evidence is removed and remaining node weights are renormalized; an
+update that leaves a node without eligible evidence is rejected.
+
+Outputs include per-update certificate transitions, maximum certified source
+budget before/after, invalidation reason, no-op-valid versus invalidated counts,
+stale-certificate retention, exact incremental/full agreement, and measured
+recalculation speed. Writes `results/E15` with update/summary CSVs, audit, and
+SHA-256 manifest, plus `tables/e15_certificates.tex`. These are controlled
+synthetic cases; timings are local benchmark measurements, not a production
+latency guarantee.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -250,6 +270,7 @@ cerurl run-e11 --out results/E11 --tables tables
 cerurl run-e12 --out results/E12 --tables tables
 cerurl run-e13 --out results/E13 --tables tables
 cerurl run-e14 --out results/E14 --tables tables
+cerurl run-e15 --out results/E15 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42

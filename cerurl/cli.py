@@ -22,6 +22,7 @@ from .e11 import run_e11
 from .e12 import run_e12
 from .e13 import DEFAULT_BUDGETS, run_e13
 from .e14 import DEFAULT_E14_BUDGETS, run_e14
+from .e15 import run_e15
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -132,6 +133,11 @@ def main(argv=None):
     d.add_argument('--repeats',type=int,default=3)
     d.add_argument('--seed',type=int,default=20261414)
     d.add_argument('--budgets',default=','.join(map(str,DEFAULT_E14_BUDGETS)))
+    d=cmd.add_parser('run-e15',help='E15 certificate strengthening and proof-input invalidation')
+    d.add_argument('--out',default='results/E15')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--cases',type=int,default=30)
+    d.add_argument('--seed',type=int,default=20261515)
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -223,6 +229,13 @@ def main(argv=None):
                   tuple(int(x) for x in args.budgets.split(',')))
         result={'out':args.out,'cases_per_repeat':a['cases_per_repeat'],
                 'repeats':a['repeats'],'runtime_seconds':a['runtime_seconds'],
+                'pass_criteria':a['pass_criteria']}
+    elif args.command=='run-e15':
+        a=run_e15(args.out,args.tables,args.cases,args.seed)
+        result={'out':args.out,'cases':a['cases'],'runtime_seconds':a['runtime_seconds'],
+                'invalidated_updates':a['invalidated_updates'],
+                'stale_certificate_retention_rate':a['stale_certificate_retention_rate'],
+                'median_incremental_speedup':a['median_incremental_speedup'],
                 'pass_criteria':a['pass_criteria']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
