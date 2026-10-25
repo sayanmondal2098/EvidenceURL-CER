@@ -16,9 +16,25 @@ from typing import Any
 
 import numpy as np
 
+from .e01_sources import audit_acquired_sources
+from .e02 import prepare_e02
+from .e03 import prepare_e03
+from .e04 import prepare_e04
+from .e05 import run_e05
 from .e06 import run_e06
+from .e07 import run_e07
+from .e08 import run_e08
+from .e09 import run_e09
+from .e10 import run_e10
+from .e11 import run_e11
+from .e12 import run_e12
 from .e13 import DEFAULT_BUDGETS, run_e13
+from .e14 import run_e14
+from .e15 import run_e15
+from .e16 import run_e16
+from .e17 import run_e17
 from .e18 import run_e18
+from .e19 import run_e19
 
 EXPERIMENTS = tuple(f"E{index:02d}" for index in range(1, 20))
 E20_MULTI_SEED_REPLAYS = {"E06", "E13", "E18"}
@@ -218,8 +234,12 @@ def _controlled_fixture(root: Path) -> dict[str, Any]:
     return result
 
 
-def _experiment_record(root: Path, experiment: str) -> dict[str, Any]:
-    directory = root / "results" / experiment
+def _experiment_record(
+    root: Path,
+    experiment: str,
+    archive_root: Path | None = None,
+) -> dict[str, Any]:
+    directory = (archive_root or root / "results") / experiment
     audit_path = directory / "audit.json"
     run_manifest_path = directory / "run_manifest.json"
     audit = _json(audit_path) if audit_path.is_file() else {}
@@ -995,6 +1015,7 @@ def run_e20(
     seed_base: int = 20262020,
     e06_cases: int = 1200,
     replay_cases: int = 12,
+    archive_root: str | None = None,
 ) -> dict[str, Any]:
     """Audit archived E01-E19 outputs offline and run preregistered synthetic replays."""
     if type(seed_runs) is not int or seed_runs < 0:
@@ -1014,6 +1035,9 @@ def run_e20(
     tables = Path(table_dir)
     if not tables.is_absolute():
         tables = root / tables
+    archives = Path(archive_root) if archive_root else root / "results"
+    if not archives.is_absolute():
+        archives = root / archives
     out.mkdir(parents=True, exist_ok=True)
     tables.mkdir(parents=True, exist_ok=True)
 
@@ -1025,7 +1049,7 @@ def run_e20(
     preregistration_sha256 = _hash(preregistration_path)
 
     experiment_rows = [
-        _experiment_record(root, experiment) for experiment in EXPERIMENTS
+        _experiment_record(root, experiment, archives) for experiment in EXPERIMENTS
     ]
     e13_runs, e18_runs = [], []
     e06_runs = []
@@ -1452,4 +1476,173 @@ def run_e20(
     if len(hashes) != audit["manifest_entry_count"]:
         raise RuntimeError("E20 manifest entry count changed during finalization")
     _write_json(out / "manifest_sha256.json", hashes)
+    return audit
+
+
+def _pipeline_status(result: dict[str, Any]) -> str:
+    pass_criteria = result.get("pass_criteria")
+    if isinstance(pass_criteria, dict) and isinstance(pass_criteria.get("status"), str):
+        return pass_criteria["status"]
+    for key in ("status", "run_status"):
+        value = result.get(key)
+        if isinstance(value, str):
+            return value
+    return "completed_status_not_reported"
+
+
+def _pipeline_result_summary(result: dict[str, Any]) -> dict[str, Any]:
+    fields = (
+        "pass_criteria", "runtime_seconds", "cases", "sites", "policy_trials",
+        "trial_count", "completed_sizes", "skipped_sizes", "missing_inputs",
+        "metrics_reported", "status", "run_status",
+    )
+    summary = {key: result[key] for key in fields if key in result}
+    return summary
+
+
+def run_full_pipeline(
+    out_root: str = "results/full_pipeline",
+    seed_runs: int = 5,
+    seed_base: int = 20262020,
+) -> dict[str, Any]:
+    """Run the E01-E20 offline workflow and retain a per-step execution audit.
+
+    This orchestrates the repository's documented default experiments. It
+    never acquires live feeds and leaves existing result directories untouched.
+    """
+    if type(seed_runs) is not int or (seed_runs != 0 and seed_runs < 5):
+        raise ValueError("seed_runs must be 0 (archive-only E20) or >= 5")
+    if type(seed_base) is not int:
+        raise ValueError("seed_base must be an integer")
+
+    project_root = Path.cwd().resolve()
+    output_root = Path(out_root)
+    if not output_root.is_absolute():
+        output_root = project_root / output_root
+    output_root = output_root.resolve()
+    if output_root in (project_root, project_root / "results"):
+        raise ValueError("out_root must be a dedicated run directory, not the project or results root")
+    if output_root.exists() and any(output_root.iterdir()):
+        raise FileExistsError(
+            f"pipeline output directory is not empty: {output_root}; choose a fresh --out-root"
+        )
+
+    table_root = output_root / "tables"
+    table_root.mkdir(parents=True, exist_ok=True)
+
+    def output(experiment: str) -> str:
+        return str(output_root / experiment)
+
+    # E02-E04 consume E01's audit, so this ordered list also encodes dependencies.
+    steps: list[tuple[str, Any, dict[str, Any]]] = [
+        ("E01", audit_acquired_sources, {
+            "raw_dir": str(project_root / "data" / "raw"),
+            "out_dir": output("E01"),
+            "table_dir": str(table_root),
+        }),
+        ("E02", prepare_e02, {
+            "out_dir": output("E02"),
+            "audit_path": str(output_root / "E01" / "audit.json"),
+        }),
+        ("E03", prepare_e03, {
+            "out_dir": output("E03"),
+            "audit_path": str(output_root / "E01" / "audit.json"),
+        }),
+        ("E04", prepare_e04, {
+            "out_dir": output("E04"),
+            "audit_path": str(output_root / "E01" / "audit.json"),
+        }),
+        ("E05", run_e05, {"out_dir": output("E05"), "table_dir": str(table_root)}),
+        ("E06", run_e06, {
+            "out_dir": output("E06"), "table_dir": str(table_root),
+            "n_cases": 1200, "seed": 20260606,
+        }),
+        ("E07", run_e07, {"out_dir": output("E07"), "table_dir": str(table_root)}),
+        ("E08", run_e08, {"out_dir": output("E08"), "table_dir": str(table_root)}),
+        ("E09", run_e09, {"out_dir": output("E09"), "table_dir": str(table_root)}),
+        ("E10", run_e10, {"out_dir": output("E10"), "table_dir": str(table_root)}),
+        ("E11", run_e11, {"out_dir": output("E11"), "table_dir": str(table_root)}),
+        ("E12", run_e12, {"out_dir": output("E12"), "table_dir": str(table_root)}),
+        ("E13", run_e13, {"out_dir": output("E13"), "table_dir": str(table_root)}),
+        ("E14", run_e14, {"out_dir": output("E14"), "table_dir": str(table_root)}),
+        ("E15", run_e15, {"out_dir": output("E15"), "table_dir": str(table_root)}),
+        ("E16", run_e16, {
+            "out_dir": output("E16"), "table_dir": str(table_root),
+            "cohort_path": str(project_root / "data" / "E16" / "cohorts.csv"),
+            "prediction_path": str(project_root / "data" / "E16" / "predictions.csv"),
+            "label_path": str(project_root / "data" / "E16" / "labels.csv"),
+            "feed_events_path": str(project_root / "data" / "E16" / "feed_events.csv"),
+        }),
+        ("E17", run_e17, {"out_dir": output("E17"), "table_dir": str(table_root)}),
+        ("E18", run_e18, {"out_dir": output("E18"), "table_dir": str(table_root)}),
+        ("E19", run_e19, {"out_dir": output("E19"), "table_dir": str(table_root)}),
+        ("E20", run_e20, {
+            "out_dir": output("E20"),
+            "table_dir": str(table_root),
+            "seed_runs": seed_runs,
+            "seed_base": seed_base,
+            "archive_root": str(output_root),
+        }),
+    ]
+
+    records: list[dict[str, Any]] = []
+    for experiment, runner, kwargs in steps:
+        started = time.perf_counter()
+        try:
+            result = runner(**kwargs)
+        except Exception as exc:
+            # Preserve the failure and continue with independent experiments.
+            records.append({
+                "experiment": experiment,
+                "execution_status": "failed",
+                "result_status": "exception",
+                "output": output(experiment),
+                "runtime_seconds": time.perf_counter() - started,
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+            })
+            continue
+        status = _pipeline_status(result)
+        normalized = status.lower()
+        is_blocked = any(marker in normalized for marker in (
+            "blocked", "not_run", "not-run", "not run", "partial",
+            "baseline_not_reproducible", "missing",
+        ))
+        is_failure = normalized in {"fail", "failed", "error", "exception"}
+        records.append({
+            "experiment": experiment,
+            "execution_status": "failed" if is_failure else "completed",
+            "result_status": status,
+            "output": output(experiment),
+            "runtime_seconds": time.perf_counter() - started,
+            "blocked": is_blocked,
+            "summary": _pipeline_result_summary(result),
+        })
+
+    failed = [row["experiment"] for row in records if row["execution_status"] == "failed"]
+    blocked = [
+        row["experiment"] for row in records
+        if row.get("blocked") or row["result_status"] == "exception"
+    ]
+    status = (
+        "completed_with_failures" if failed
+        else "completed_with_blockers" if blocked
+        else "completed"
+    )
+    audit = {
+        "pipeline": "E01-E20",
+        "status": status,
+        "network_accessed": False,
+        "mutable_feeds_downloaded": False,
+        "project_root": str(project_root),
+        "output_root": str(output_root),
+        "seed_runs": seed_runs,
+        "seed_base": seed_base,
+        "experiment_count": len(records),
+        "completed_count": sum(row["execution_status"] == "completed" for row in records),
+        "failed_experiments": failed,
+        "blocked_or_partial_experiments": blocked,
+        "steps": records,
+    }
+    _write_json(output_root / "pipeline_audit.json", audit)
     return audit

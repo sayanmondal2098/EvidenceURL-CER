@@ -377,6 +377,28 @@ reproduction and licensing blockers.
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
 
+### Run the offline E01-E20 pipeline with one command
+
+The orchestrator executes E01 through E20 in dependency order, using the
+experiments' documented controlled defaults and storing all outputs under a
+dedicated fresh directory. It does not download feeds or acquire sources.
+E02/E03 and E16 remain explicitly blocked when their authoritative or
+prospective inputs are missing; a blocked study is reported, not synthesized.
+The full default run includes E19's requested scale benchmark and five E20
+replay seeds and may take substantial time and disk space.
+
+```bash
+python -m cerurl.cli run-pipeline --out-root results/full_pipeline --seed-runs 5
+```
+
+The command writes `pipeline_audit.json` with each experiment's status, runtime,
+output location, and any execution error. Existing non-empty output directories
+are never overwritten; use a new `--out-root` for each run. Use
+`--seed-runs 0` only to request E20's archive-only final audit without its
+confirmatory replays. This orchestration does not make the field experiments
+run without their required external data, and E02-E04 are preflight/audit
+workflows rather than fabricated model evaluations.
+
 ```bash
 # 0. Setup and unit tests
 python -m venv venv && venv\Scripts\activate        # Linux/macOS: source venv/bin/activate

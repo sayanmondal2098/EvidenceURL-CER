@@ -27,7 +27,7 @@ from .e16 import run_e16
 from .e17 import run_e17
 from .e18 import run_e18
 from .e19 import DEFAULT_SIZES, run_e19
-from .e20 import run_e20
+from .e20 import run_e20, run_full_pipeline
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -181,6 +181,12 @@ def main(argv=None):
     d.add_argument('--seed-base',type=int,default=20262020)
     d.add_argument('--e06-cases',type=int,default=1200)
     d.add_argument('--replay-cases',type=int,default=12)
+    d=cmd.add_parser('run-pipeline',help='Run the offline E01-E20 workflow in order')
+    d.add_argument('--out-root',default='results/full_pipeline',
+                   help='Fresh, dedicated directory for all experiment outputs')
+    d.add_argument('--seed-runs',type=int,default=5,
+                   help='E20 replay seeds: 0 for archive-only or at least 5')
+    d.add_argument('--seed-base',type=int,default=20262020)
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -328,12 +334,22 @@ def main(argv=None):
                 'seed_replay_count':a['seed_replays']['seed_runs_requested'],
                 'confirmatory_hypotheses':a['confirmatory_hypotheses'],
                 'runtime_seconds':a['runtime_seconds']}
+    elif args.command=='run-pipeline':
+        a=run_full_pipeline(args.out_root,args.seed_runs,args.seed_base)
+        result={'out_root':a['output_root'],'status':a['status'],
+                'experiment_count':a['experiment_count'],
+                'completed_count':a['completed_count'],
+                'failed_experiments':a['failed_experiments'],
+                'blocked_or_partial_experiments':a['blocked_or_partial_experiments'],
+                'pipeline_audit':str(Path(args.out_root)/'pipeline_audit.json')}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
     elif args.command=='prepare-e04': result=prepare_e04(args.out,args.audit)
     elif args.command=='source-registry': result=write_source_registry(args.json_out,args.markdown_out)
     elif args.command=='acquire-sources': result=acquire_sources(args.plan,args.out,args.dry_run,set(args.only.split(',')) if args.only else None,args.log,not args.quiet)
     print(json.dumps(result,indent=2))
+    if args.command=='run-pipeline' and result['status']=='completed_with_failures':
+        return 1
     return 0
 
-if __name__=='__main__':main()
+if __name__=='__main__':raise SystemExit(main())
