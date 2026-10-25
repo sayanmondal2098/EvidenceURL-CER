@@ -15,6 +15,7 @@ from .e01_sources import audit_acquired_sources
 from .e05 import run_e05
 from .e06 import run_e06
 from .e07 import run_e07
+from .e08 import run_e08
 from .e02 import prepare_e02
 from .e03 import prepare_e03
 from .e04 import prepare_e04
@@ -84,6 +85,11 @@ def main(argv=None):
     d.add_argument('--budgets',default='0,1,2,3,4,5')
     d.add_argument('--reps',type=int,default=2)
     d.add_argument('--time-limit',type=float,default=10.0)
+    d=cmd.add_parser('run-e08',help='E08 joint source + typed-graph attacks and joint certificate')
+    d.add_argument('--out',default='results/E08')
+    d.add_argument('--tables',default='tables')
+    d.add_argument('--cases',type=int,default=96)
+    d.add_argument('--seed',type=int,default=20260808)
     d=cmd.add_parser('prepare-e02',help='Create an honest frozen-URLTrust reproduction preflight package')
     d.add_argument('--out',default='results/E02')
     d.add_argument('--audit',default='results/E01/audit.json')
@@ -145,6 +151,9 @@ def main(argv=None):
     elif args.command=='run-e07':
         a=run_e07(args.out,args.tables,tuple(int(x) for x in args.sizes.split(',')),tuple(int(x) for x in args.budgets.split(',')),args.reps,args.time_limit)
         result={'out':args.out,'cases':a['cases'],'runtime_seconds':a['runtime_seconds'],'soundness':a['soundness']['violations'],'certifier_comparison':a['certifier_comparison'],'by_size':a['by_size'],'pass_criteria':a['pass_criteria']}
+    elif args.command=='run-e08':
+        a=run_e08(args.out,args.tables,args.cases,args.seed)
+        result={'out':args.out,'cases':a['cases'],'actionable_cases':a['actionable_cases'],'runtime':a['runtime'],'soundness':a['soundness'],'property_tests':a['property_tests'],'semantic_preserving_checks':a['semantic_preserving_checks'],'pass_criteria':a['pass_criteria']}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
     elif args.command=='prepare-e04': result=prepare_e04(args.out,args.audit)
