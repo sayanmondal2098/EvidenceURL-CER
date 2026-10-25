@@ -182,6 +182,27 @@ abstention costs. Certificate coverage measures stability under the declared
 source-group budget, not correctness. Results are controlled simulations,
 not field performance.
 
+### E14 - Corrected/degraded decisions and safe abstention
+
+`cerurl run-e14 [--cases 30 --repeats 3 --seed 20261414 --budgets 0,1,2,3,5]`
+compares no repair, a fixed static extra-scan schedule, and certificate-guided
+repair on controlled synthetic cases. A separate calibration split freezes
+probability bins and benign/malicious release thresholds under a stated
+calibration error constraint; test labels are evaluation-only and unavailable
+to action selectors. Every post-action result is classified as correct, wrong,
+or abstained against the held-out label, and exact unchanged decisions are
+recorded separately from correctness transitions. Outputs include the complete
+transition counts and denominators, corrections/degradations, abstain fraction,
+selective risk/coverage, calibration curves, multiple operational loss
+functions, corrected-case acquisition cost, paired comparisons, and
+condition-stratified error analysis. Certification is measured as source-group
+stability, not as correctness. This experiment uses synthetic calibration and
+test data; it is not field-performance evidence.
+
+Writes `results/E14` with an audit, per-trial and transition CSVs, calibration
+curves, paired/error-analysis summaries and a SHA-256 manifest, plus
+`tables/e14_decisions.tex`.
+
 ## Run every experiment (step by step)
 
 Run from the project root. On Windows replace `cerurl` with `.\venv\Scripts\python.exe -m cerurl.cli` if the console script is not on PATH.
@@ -228,6 +249,7 @@ cerurl run-e10 --out results/E10 --tables tables
 cerurl run-e11 --out results/E11 --tables tables
 cerurl run-e12 --out results/E12 --tables tables
 cerurl run-e13 --out results/E13 --tables tables
+cerurl run-e14 --out results/E14 --tables tables
 
 # Controlled benchmark / repair demo (feeds the certification plots in "Quick start")
 cerurl generate --out data/controlled_cases.jsonl --cases 250 --seed 42
