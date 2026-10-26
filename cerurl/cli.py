@@ -341,7 +341,7 @@ def main(argv=None):
                 'completed_count':a['completed_count'],
                 'failed_experiments':a['failed_experiments'],
                 'blocked_or_partial_experiments':a['blocked_or_partial_experiments'],
-                'pipeline_audit':str(Path(args.out_root)/'pipeline_audit.json')}
+                'pipeline_audit':str(Path(a['output_root'])/'pipeline_audit.json')}
     elif args.command=='prepare-e02': result=prepare_e02(args.out,args.audit,args.authoritative_dir)
     elif args.command=='prepare-e03': result=prepare_e03(args.out,args.audit)
     elif args.command=='prepare-e04': result=prepare_e04(args.out,args.audit)

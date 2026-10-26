@@ -1494,10 +1494,55 @@ def _pipeline_result_summary(result: dict[str, Any]) -> dict[str, Any]:
     fields = (
         "pass_criteria", "runtime_seconds", "cases", "sites", "policy_trials",
         "trial_count", "completed_sizes", "skipped_sizes", "missing_inputs",
-        "metrics_reported", "status", "run_status",
+        "metrics_reported", "status", "run_status", "blockers", "controls",
+        "reason", "limitations", "first_seen_qualified_records",
+        "historical_records_blocked", "real_attested_observations",
+        "unattested_records",
     )
     summary = {key: result[key] for key in fields if key in result}
     return summary
+
+
+def _append_pipeline_log(
+    jsonl_path: Path,
+    text_path: Path,
+    event: str,
+    **fields: Any,
+) -> None:
+    """Persist structured and readable progress as soon as each event occurs."""
+    timestamp = datetime.now(timezone.utc).isoformat()
+    record = {"timestamp_utc": timestamp, "event": event, **fields}
+    with jsonl_path.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(record, sort_keys=True, default=str) + "\n")
+        stream.flush()
+    details = " ".join(
+        f"{key}={json.dumps(value, sort_keys=True, default=str)}"
+        for key, value in fields.items()
+    )
+    with text_path.open("a", encoding="utf-8") as stream:
+        stream.write(f"{timestamp} {event}" + (f" {details}" if details else "") + "\n")
+        stream.flush()
+    print(f"[{timestamp}] {event}" + (f" {details}" if details else ""), flush=True)
+
+
+def _reserve_pipeline_output(requested_root: Path) -> Path:
+    """Atomically reserve a new output directory without touching prior runs."""
+    requested_root.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        requested_root.mkdir()
+        return requested_root
+    except FileExistsError:
+        suffix = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        base = requested_root.with_name(f"{requested_root.name}_{suffix}")
+        candidate = base
+        attempt = 2
+        while True:
+            try:
+                candidate.mkdir()
+                return candidate
+            except FileExistsError:
+                candidate = base.with_name(f"{base.name}_{attempt:02d}")
+                attempt += 1
 
 
 def run_full_pipeline(
@@ -1508,7 +1553,7 @@ def run_full_pipeline(
     """Run the E01-E20 offline workflow and retain a per-step execution audit.
 
     This orchestrates the repository's documented default experiments. It
-    never acquires live feeds and leaves existing result directories untouched.
+    never acquires live feeds and reserves a new directory for every run.
     """
     if type(seed_runs) is not int or (seed_runs != 0 and seed_runs < 5):
         raise ValueError("seed_runs must be 0 (archive-only E20) or >= 5")
@@ -1522,13 +1567,26 @@ def run_full_pipeline(
     output_root = output_root.resolve()
     if output_root in (project_root, project_root / "results"):
         raise ValueError("out_root must be a dedicated run directory, not the project or results root")
-    if output_root.exists() and any(output_root.iterdir()):
-        raise FileExistsError(
-            f"pipeline output directory is not empty: {output_root}; choose a fresh --out-root"
-        )
+    requested_root = output_root
+    output_root = _reserve_pipeline_output(requested_root)
 
     table_root = output_root / "tables"
     table_root.mkdir(parents=True, exist_ok=True)
+    log_root = output_root / "logs"
+    log_root.mkdir(parents=True, exist_ok=True)
+    events_path = log_root / "pipeline_events.jsonl"
+    text_log_path = log_root / "pipeline.log"
+    _append_pipeline_log(
+        events_path,
+        text_log_path,
+        "pipeline_started",
+        pipeline="E01-E20",
+        requested_output_root=str(requested_root),
+        output_root=str(output_root),
+        seed_runs=seed_runs,
+        seed_base=seed_base,
+        network_accessed=False,
+    )
 
     def output(experiment: str) -> str:
         return str(output_root / experiment)
@@ -1588,11 +1646,18 @@ def run_full_pipeline(
     records: list[dict[str, Any]] = []
     for experiment, runner, kwargs in steps:
         started = time.perf_counter()
+        _append_pipeline_log(
+            events_path,
+            text_log_path,
+            "experiment_started",
+            experiment=experiment,
+            output=output(experiment),
+        )
         try:
             result = runner(**kwargs)
         except Exception as exc:
-            # Preserve the failure and continue with independent experiments.
-            records.append({
+            # Log the exception and continue so independent experiments still run.
+            failure_record = {
                 "experiment": experiment,
                 "execution_status": "failed",
                 "result_status": "exception",
@@ -1600,7 +1665,14 @@ def run_full_pipeline(
                 "runtime_seconds": time.perf_counter() - started,
                 "error_type": type(exc).__name__,
                 "error": str(exc),
-            })
+            }
+            records.append(failure_record)
+            _append_pipeline_log(
+                events_path,
+                text_log_path,
+                "experiment_failed",
+                **failure_record,
+            )
             continue
         status = _pipeline_status(result)
         normalized = status.lower()
@@ -1609,7 +1681,7 @@ def run_full_pipeline(
             "baseline_not_reproducible", "missing",
         ))
         is_failure = normalized in {"fail", "failed", "error", "exception"}
-        records.append({
+        step_record = {
             "experiment": experiment,
             "execution_status": "failed" if is_failure else "completed",
             "result_status": status,
@@ -1617,7 +1689,14 @@ def run_full_pipeline(
             "runtime_seconds": time.perf_counter() - started,
             "blocked": is_blocked,
             "summary": _pipeline_result_summary(result),
-        })
+        }
+        records.append(step_record)
+        _append_pipeline_log(
+            events_path,
+            text_log_path,
+            "experiment_completed",
+            **step_record,
+        )
 
     failed = [row["experiment"] for row in records if row["execution_status"] == "failed"]
     blocked = [
@@ -1645,4 +1724,14 @@ def run_full_pipeline(
         "steps": records,
     }
     _write_json(output_root / "pipeline_audit.json", audit)
+    _append_pipeline_log(
+        events_path,
+        text_log_path,
+        "pipeline_completed",
+        status=status,
+        completed_count=audit["completed_count"],
+        failed_experiments=failed,
+        blocked_or_partial_experiments=blocked,
+        audit_path=str(output_root / "pipeline_audit.json"),
+    )
     return audit

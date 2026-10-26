@@ -1,0 +1,38 @@
+         275516 function calls in 0.150 seconds
+
+   Ordered by: cumulative time
+   List reduced from 53 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.030    0.030    0.115    0.115 D:\URL Trust\EvidenceURL-CER\cerurl\e19.py:262(_ingest)
+    10000    0.010    0.000    0.043    0.000 C:\Python314\Lib\json\__init__.py:185(dumps)
+    10000    0.005    0.000    0.036    0.000 C:\Python314\Lib\json\__init__.py:304(loads)
+        1    0.001    0.001    0.032    0.032 {built-in method numpy.fromiter}
+    10001    0.009    0.000    0.031    0.000 D:\URL Trust\EvidenceURL-CER\cerurl\e19.py:436(<genexpr>)
+    10000    0.008    0.000    0.031    0.000 C:\Python314\Lib\json\encoder.py:185(encode)
+    10000    0.010    0.000    0.029    0.000 C:\Python314\Lib\json\decoder.py:340(decode)
+    10000    0.015    0.000    0.022    0.000 D:\URL Trust\EvidenceURL-CER\cerurl\e19.py:255(_close_record)
+    10000    0.020    0.000    0.020    0.000 C:\Python314\Lib\json\encoder.py:207(iterencode)
+    10000    0.011    0.000    0.011    0.000 C:\Python314\Lib\json\decoder.py:351(raw_decode)
+    19960    0.006    0.000    0.006    0.000 {method 'update' of 'set' objects}
+    20000    0.005    0.000    0.005    0.000 {method 'match' of 're.Pattern' objects}
+    50132    0.004    0.000    0.004    0.000 {built-in method builtins.len}
+    30220    0.003    0.000    0.003    0.000 {built-in method builtins.isinstance}
+    10000    0.002    0.000    0.002    0.000 C:\Python314\Lib\json\encoder.py:105(__init__)
+    20000    0.002    0.000    0.002    0.000 {method 'end' of 're.Match' objects}
+    10000    0.002    0.000    0.002    0.000 {method 'tolist' of 'numpy.ndarray' objects}
+       44    0.000    0.000    0.002    0.000 C:\Users\sayan\AppData\Roaming\Python\Python314\site-packages\scipy\sparse\_base.py:647(dot)
+        1    0.000    0.000    0.001    0.001 D:\URL Trust\EvidenceURL-CER\cerurl\e19.py:209(_propagate)
+       44    0.000    0.000    0.001    0.000 C:\Users\sayan\AppData\Roaming\Python\Python314\site-packages\scipy\sparse\_base.py:1006(__matmul__)
+    12000    0.001    0.000    0.001    0.000 {built-in method time.perf_counter}
+    10000    0.001    0.000    0.001    0.000 {method 'join' of 'str' objects}
+       44    0.000    0.000    0.001    0.000 C:\Users\sayan\AppData\Roaming\Python\Python314\site-packages\scipy\sparse\_base.py:875(_matmul_dispatch)
+       44    0.000    0.000    0.001    0.000 C:\Users\sayan\AppData\Roaming\Python\Python314\site-packages\scipy\sparse\_compressed.py:387(_matmul_vector)
+        1    0.000    0.000    0.001    0.001 D:\URL Trust\EvidenceURL-CER\cerurl\e19.py:223(_propagate_delta)
+    10000    0.001    0.000    0.001    0.000 {method 'startswith' of 'str' objects}
+       44    0.001    0.000    0.001    0.000 {built-in method scipy.sparse._sparsetools.csr_matvec}
+     2000    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+       44    0.000    0.000    0.000    0.000 C:\Users\sayan\AppData\Roaming\Python\Python314\site-packages\numpy\_core\fromnumeric.py:3011(max)
+       44    0.000    0.000    0.000    0.000 C:\Users\sayan\AppData\Roaming\Python\Python314\site-packages\numpy\_core\fromnumeric.py:66(_wrapreduction)
+
+

@@ -391,9 +391,19 @@ replay seeds and may take substantial time and disk space.
 python -m cerurl.cli run-pipeline --out-root results/full_pipeline --seed-runs 5
 ```
 
+Equivalent script entry point:
+
+```bash
+python run_offline_demo.py --full-pipeline --out-root results/full_pipeline --seed-runs 5
+```
+
 The command writes `pipeline_audit.json` with each experiment's status, runtime,
-output location, and any execution error. Existing non-empty output directories
-are never overwritten; use a new `--out-root` for each run. Use
+output location, and any execution error. Live progress is printed and flushed
+to `logs/pipeline.log`; structured start/completion/failure events are appended
+to `logs/pipeline_events.jsonl`, so progress survives a later step failure or
+interruption. If the requested output directory already exists, the runner
+selects a timestamped sibling directory (adding a numeric suffix if necessary)
+and reports the actual path; prior results are left untouched. Use
 `--seed-runs 0` only to request E20's archive-only final audit without its
 confirmatory replays. This orchestration does not make the field experiments
 run without their required external data, and E02-E04 are preflight/audit

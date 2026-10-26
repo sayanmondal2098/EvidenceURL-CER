@@ -1,5 +1,6 @@
 import hashlib
 import json
+from pathlib import Path
 
 import pytest
 
@@ -75,6 +76,8 @@ def test_full_pipeline_runs_in_order_and_records_blocked_inputs(tmp_path, monkey
     for experiment, runner_name in zip(experiments, runner_names):
         def stub(experiment=experiment, **kwargs):
             calls.append((experiment, kwargs))
+            if experiment == "E10":
+                raise RuntimeError("controlled runner failure for orchestration test")
             if experiment == "E16":
                 return {"status": "NOT_RUN_INPUTS_MISSING"}
             return {"pass_criteria": {"status": "pass"}}
@@ -86,20 +89,51 @@ def test_full_pipeline_runs_in_order_and_records_blocked_inputs(tmp_path, monkey
 
     assert [experiment for experiment, _ in calls] == list(experiments)
     assert audit["experiment_count"] == 20
-    assert audit["status"] == "completed_with_blockers"
-    assert audit["blocked_or_partial_experiments"] == ["E16"]
+    assert audit["status"] == "completed_with_failures"
+    assert audit["failed_experiments"] == ["E10"]
+    assert audit["blocked_or_partial_experiments"] == ["E10", "E16"]
     e20_kwargs = dict(calls[-1][1])
     assert e20_kwargs["archive_root"] == str(out_root)
     assert json.loads((out_root / "pipeline_audit.json").read_text())["status"] == audit["status"]
+    events = [
+        json.loads(line)
+        for line in (out_root / "logs" / "pipeline_events.jsonl").read_text().splitlines()
+    ]
+    assert [row["experiment"] for row in events if row["event"] == "experiment_started"] == list(experiments)
+    assert any(
+        row["event"] == "experiment_failed" and row["experiment"] == "E10"
+        for row in events
+    )
+    assert events[-1]["event"] == "pipeline_completed"
+    assert (out_root / "logs" / "pipeline.log").is_file()
 
 
-def test_full_pipeline_refuses_nonempty_output_directory(tmp_path):
+def test_full_pipeline_uses_new_directory_when_requested_output_exists(tmp_path, monkeypatch):
+    import cerurl.e20 as e20
+
     out_root = tmp_path / "existing"
     out_root.mkdir()
     marker = out_root / "keep.txt"
     marker.write_text("existing data")
 
-    with pytest.raises(FileExistsError):
-        run_full_pipeline(str(out_root), seed_runs=0)
+    runner_names = (
+        "audit_acquired_sources", "prepare_e02", "prepare_e03", "prepare_e04",
+        "run_e05", "run_e06", "run_e07", "run_e08", "run_e09", "run_e10",
+        "run_e11", "run_e12", "run_e13", "run_e14", "run_e15", "run_e16",
+        "run_e17", "run_e18", "run_e19", "run_e20",
+    )
+    for runner_name in runner_names:
+        monkeypatch.setattr(
+            e20,
+            runner_name,
+            lambda **kwargs: {"pass_criteria": {"status": "pass"}},
+        )
 
+    audit = run_full_pipeline(str(out_root), seed_runs=0)
+
+    selected_root = Path(audit["output_root"])
+    assert selected_root != out_root
+    assert selected_root.parent == out_root.parent
+    assert selected_root.is_dir()
+    assert (selected_root / "pipeline_audit.json").is_file()
     assert marker.read_text() == "existing data"
